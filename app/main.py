@@ -1,21 +1,29 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import aircraft, defense, jamming
+from app.db.migrations import migrate_database
+from app.routers import aircraft, auth, airport
 
-app = FastAPI(title="Command Control API")
+app = FastAPI(title="Hava Komuta Kontrol Sistemi")
 
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # frontend URL'n varsa sadece onu yaz
+    allow_origins=["*"],  # Allows all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
-app.include_router(aircraft.router, prefix="/aircraft", tags=["Aircraft"])
-app.include_router(defense.router, prefix="/defense", tags=["Defense"])
-app.include_router(jamming.router, prefix="/jamming", tags=["Jamming"])
+# Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(aircraft.router, prefix="/api/aircrafts", tags=["aircraft"])
+app.include_router(airport.router, prefix="/api/airports", tags=["airports"])
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup"""
+    migrate_database()
 
 @app.get("/")
-def root():
-    return {"message": "Command Control Backend is running 🚀"}
+async def root():
+    return {"message": "Hava Komuta Kontrol Sistemi API"}
