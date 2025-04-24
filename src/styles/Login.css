@@ -67,3 +67,33 @@
   background-color: #ccc;
   cursor: not-allowed;
 } 
+
+
+
+.login-type-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.login-type-buttons button {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: #c0c0c0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: black;
+  transition: background-color 0.2s;
+}
+
+.login-type-buttons button.selected {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.login-type-buttons button:hover {
+  background-color: #357abd;
+}
