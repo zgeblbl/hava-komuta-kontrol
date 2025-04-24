@@ -7,12 +7,13 @@ const Navbar = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedFlightId, setExpandedFlightId] = useState(null);
 
 /*dummy data for search functionality beloww */
   const sampleFlights = [
-    { id: 1, code: 'TK101', model: 'Boeing 737', speed: 850, altitude: 9000, country: 'Turkey', airline: 'Turkish Airlines' },
-    { id: 2, code: 'LH202', model: 'Airbus A320', speed: 780, altitude: 11000, country: 'Germany', airline: 'Lufthansa' },
-    { id: 3, code: 'BA303', model: 'Concorde', speed: 1200, altitude: 15000, country: 'UK', airline: 'British Airways' },
+    { id: 1, code: 'TK101', model: 'Boeing 737', speed: 850, altitude: 9000, country: 'Türkiye', airline: 'Türk Hava Yolları' },
+    { id: 2, code: 'LH202', model: 'Airbus A320', speed: 780, altitude: 11000, country: 'Almanya', airline: 'Lufthansa' },
+    { id: 3, code: 'BA303', model: 'Concorde', speed: 1200, altitude: 15000, country: 'Birleşik Krallık', airline: 'British Airways' }
   ];
   const [flights] = useState(sampleFlights);
 
@@ -23,6 +24,9 @@ const Navbar = () => {
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
+  };
+  const handleResultClick = (id) => {
+    setExpandedFlightId(expandedFlightId === id ? null : id);
   };
 
   return (
@@ -36,19 +40,29 @@ const Navbar = () => {
         <form onSubmit={(e) => e.preventDefault()} className="search-form">
           <input
             type="text"
-            placeholder="Search flights"
+            placeholder="Uçak Ara"
             value={searchQuery}
             onChange={handleSearchChange}
             className="search-input"
           />
-          <button type="submit" className="search-button">{t('Search')}</button>
+          <button type="submit" className="search-button">{t('Ara')}</button>
         </form>
 
         {searchQuery && filteredFlights.length > 0 && (
           <div className="search-results">
             {filteredFlights.map((flight) => (
-              <div key={flight.id} className="search-result-item">
+              <div 
+              key={flight.id} 
+              className="search-result-item"
+              onClick={() => handleResultClick(flight.id)}
+              >
                 ✈️ <strong>{flight.code}</strong> - {flight.model} | {flight.speed} km/h | {flight.altitude} m
+                {expandedFlightId === flight.id && (
+                  <div className="expanded-flight-details">
+                    <p><strong>Ülke:</strong> {flight.country}</p>
+                    <p><strong>Havalimanı:</strong> {flight.airline}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
