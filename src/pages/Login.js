@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
+import Footer from '../components/Footer';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -8,7 +9,7 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
-  const [loginType, setLoginType] = useState(null); // 'admin' or 'user'
+  const [loginType, setLoginType] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -44,6 +45,7 @@ const Login = () => {
       setError('Bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
+
 
   return (
     <div className="login-page-wrapper">
@@ -92,6 +94,8 @@ const Login = () => {
           </>
         )}
       </div>
+      <Footer />
+
     </div>
   );
 };
