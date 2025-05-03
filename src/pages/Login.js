@@ -12,6 +12,18 @@ const Login = () => {
   const [loginType, setLoginType] = useState(null);
   const navigate = useNavigate();
 
+  // Mock değerler
+  const mockCredentials = {
+    admin: {
+      email: 'admin@example.com',
+      password: 'admin123'
+    },
+    user: {
+      email: 'user@example.com',
+      password: 'user123'
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -24,28 +36,16 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...formData, type: loginType }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        navigate('/dashboard');
-      } else {
-        setError(data.message || 'Giriş başarısız');
-      }
-    } catch (err) {
-      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+    // Mock giriş kontrolü
+    if (formData.email === mockCredentials[loginType].email && 
+        formData.password === mockCredentials[loginType].password) {
+      localStorage.setItem('token', 'mock-token');
+      localStorage.setItem('userType', loginType);
+      navigate('/home');
+    } else {
+      setError('Geçersiz e-posta veya şifre');
     }
   };
-
 
   return (
     <div className="login-page-wrapper">
@@ -95,7 +95,6 @@ const Login = () => {
         )}
       </div>
       <Footer />
-
     </div>
   );
 };
