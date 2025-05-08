@@ -1,0 +1,75 @@
+/* src/styles/StatisticsPanel.css */
+
+/* StatisticsPanel.js içindeki en dış sarmalayıcı div için: */
+.statistics-content-wrapper { /* VEYA sizin verdiğiniz farklı bir class adı */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Ebeveynindeki (statistics-panel-container) padding'i hesaba katarak kalan tüm alanı doldurur */
+    /* height: 100%;  Eğer ebeveyninde padding varsa bu %100 tam istediğimiz gibi olmayabilir, flex-grow daha iyi. */
+    /* Eğer bu wrapper'da scroll istiyorsanız: */
+    /* overflow-y: auto; */
+    /* Ve ebeveynindeki (statistics-panel-container) overflow-y: auto; kaldırılır. */
+  }
+  
+  /* .statistics-panel-container {} // Bu boş bloğu kaldırın */
+  
+  .statistics-panel-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md, 16px); /* Fallback eklendi */
+    padding-bottom: var(--spacing-sm, 8px); /* Fallback eklendi */
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 8px); /* Fallback eklendi */
+    flex-shrink: 0; /* Başlığın küçülmemesi için */
+  }
+  
+  .statistics-panel-title .icon {
+    font-size: 1.5rem;
+    color: var(--button-primary);
+  }
+  
+  .statistic-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm, 8px) 0; /* Fallback eklendi */
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* Item'ların küçülmemesi için */
+  }
+  
+  .statistic-item:last-child {
+    border-bottom: none;
+  }
+  
+  .statistic-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+  
+  .statistic-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-primary);
+  }
+  
+  /* Grafik alanı */
+  .chart-container {
+    margin-top: var(--spacing-lg, 24px); /* Fallback eklendi */
+    padding: var(--spacing-md, 16px);    /* Fallback eklendi */
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius);
+    flex-grow: 1; /* Eğer grafik alanının kalan tüm boşluğu doldurması isteniyorsa */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px; /* Örnek minimum yükseklik */
+    flex-shrink: 0; /* Başlangıçta küçülmesin, ama içerik yoksa da fazla yer kaplamasın diye 0 daha iyi olabilir veya ayarlanabilir */
+  }
+  
+  .chart-container canvas {
+    max-width: 100%;
+    height: auto !important;
+  }

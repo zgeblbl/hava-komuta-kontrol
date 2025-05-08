@@ -7,7 +7,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import { SettingsProvider } from './context/SettingsContext';
 import './styles/global.css';
-
+import FlightControlPage from './pages/FlightControlPage'; 
+import 'leaflet/dist/leaflet.css';
 function AppContent() {
   const location = useLocation();
   const hideNavbarRoutes = ['/login'];
@@ -22,6 +23,7 @@ function AppContent() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/flight-control" element={<FlightControlPage />} /> 
         </Routes>
       </main>
     </div>

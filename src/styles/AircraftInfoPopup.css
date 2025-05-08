@@ -1,0 +1,104 @@
+/* src/styles/AircraftInfoPopup.css */
+.aircraft-info-popup {
+    position: fixed; /* Veya absolute eğer MapViewport'a göre pozisyonlanıyorsa */
+    /* FlightControlPage'e göre fixed olması daha esnek olabilir */
+    min-width: 280px;
+    max-width: 350px;
+    background-color: var(--bg-panel); /* Temadan gelen yarı şeffaf panel rengi */
+    backdrop-filter: blur(5px); /* Arka planı bulanıklaştır */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-md);
+    z-index: 1000; /* Diğer her şeyin üzerinde */
+    color: var(--text-primary); /* Temadan metin rengi */
+    font-size: 0.9rem;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    /* Başlangıçta gizli ve küçük olabilir, JS ile görünür yapılır */
+    opacity: 0;
+    transform: scale(0.95) translate(-50%, -50%); /* Pozisyonlama için referans noktası */
+    /* Pozisyon JS ile ayarlanacak, bu transform referans noktasını ortalamak içindir.
+       Eğer JS ile direkt top/left ayarlanıyorsa, translate(-50%, -50%) gerekmeyebilir.
+       Ya da top/left ayarlandıktan sonra fare imlecine göre hizalamak için translate kullanılabilir.
+       Şimdilik, position prop'u ile gelen x,y değerlerinin popup'ın sol üst köşesi olacağını varsayalım.
+    */
+  }
+  
+  .aircraft-info-popup.visible {
+    opacity: 1;
+    transform: scale(1) translate(0,0); /* Veya pozisyona göre ayarlanmış translate */
+  }
+  
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .popup-callsign {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-primary); /* Temadan ana metin rengi */
+  }
+  
+  .popup-model {
+    font-size: 0.85rem;
+    color: var(--text-secondary); /* Temadan ikincil metin rengi */
+    margin-top: -4px; /* Çağrı koduna yakınlaştırmak için */
+  }
+  
+  .popup-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+  
+  .popup-close-btn:hover {
+    color: var(--text-primary);
+  }
+  
+  .popup-content {
+    display: grid;
+    grid-template-columns: auto 1fr; /* Etiket ve değer için iki sütun */
+    gap: var(--spacing-sm) var(--spacing-md);
+    align-items: center;
+  }
+  
+  .popup-content dt { /* Açıklama terimi (etiket) */
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: right;
+  }
+  
+  .popup-content dd { /* Açıklama detayı (değer) */
+    margin-left: 0;
+    font-weight: normal;
+    color: var(--text-primary);
+    word-break: break-word; /* Uzun değerler için */
+  }
+  
+  .popup-route {
+    font-weight: bold;
+  }
+  
+  .popup-status {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    display: inline-block; /* Metin kadar yer kaplasın */
+  }
+  
+  /* Durum renkleri (global.css'deki status sınıflarını kullanabiliriz) */
+  .popup-status.status-enroute { background-color: var(--info); color: white; }
+  .popup-status.status-scheduled { background-color: var(--warning); color: black; }
+  .popup-status.status-landed { background-color: var(--success); color: white; }
+  .popup-status.status-delayed { background-color: var(--danger); color: white; }
+  .popup-status.status-active { background-color: var(--success); color: white; } /* Hava savunma sistemi için */

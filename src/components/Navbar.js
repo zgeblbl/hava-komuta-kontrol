@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import ThemeToggleButton from './ThemeToggleButton'; 
 import '../styles/Navbar.css';
 
 const Navbar = () => {
@@ -28,7 +29,7 @@ const Navbar = () => {
   const handleResultClick = (id) => {
     setExpandedFlightId(expandedFlightId === id ? null : id);
   };
-
+  
   return (
     <nav className="navbar">
       <Link to="/Home" className="nav-brand">
@@ -67,7 +68,7 @@ const Navbar = () => {
             ))}
           </div>
         )}
-
+        
         <Link
           to="/profile"
           className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}
@@ -80,6 +81,10 @@ const Navbar = () => {
         >
           {t('settings')}
         </Link>
+        {/* Tema Değiştirme Butonu */}
+        {localStorage.getItem('token') && (
+          <ThemeToggleButton />
+        )}
       </div>
     </nav>
   );
