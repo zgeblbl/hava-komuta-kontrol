@@ -1,8 +1,10 @@
 /* src/styles/FlightControlPage.css */
 
 .flight-control-page {
-    height: calc(100vh - 60px); /* Navbar yüksekliği (~60px) çıkarıldı */
+    height: calc(100vh); /* Navbar yüksekliği (~60px) çıkarıldı */
     width: 100%;
+    top: 0;
+    left: 0;
     position: relative; /* ÇOK ÖNEMLİ: Alt absolute/fixed elemanlar için */
     overflow: hidden;
     background-color: var(--bg-primary);
@@ -21,7 +23,7 @@
   /* -------- BUTONLARI SARAN OVERLAY (Sağ Üst) -------- */
   .page-actions-overlay {
     position: absolute; /* .flight-control-page'e göre konumlanır */
-    top: 10px;          /* Navbar'ın hemen altından veya üstten istediğiniz boşluk */
+    top: 90px;          /* Navbar'ın hemen altından veya üstten istediğiniz boşluk */
     right: 10px;         /* Sağdan boşluk */
     z-index: 1020;       /* Her şeyin üzerinde olması için yüksek z-index */
     display: flex;
@@ -34,7 +36,7 @@
   .statistics-panel-container { /* Bu class'ı İstatistik Panelinin div'ine vermiştik */
     position: fixed; /* Sayfaya göre sabit */
     top: 60px;       /* Navbar yüksekliği kadar aşağıdan başla */
-    right: 0;
+    right: 0px;
     width: 300px;
     height: calc(100vh - 60px); /* Navbar altından ekranın sonuna kadar */
     background-color: var(--bg-panel, rgba(240, 240, 240, 0.9)); /* Tema için --bg-panel tanımlı olmalı */
@@ -43,15 +45,16 @@
     box-shadow: -3px 0 10px rgba(0, 0, 0, 0.15);
     padding: var(--spacing-md, 16px);
     overflow-y: auto;
+    overflow-x: visible;
     z-index: 1000; 
     transition: transform 0.3s ease-in-out;
-    transform: translateX(100%); /* Başlangıçta gizli (sağda) */
+    transform: translateX(0%); /* Başlangıçta gizli (sağda) */
     display: flex;
     flex-direction: column; 
   }
   
   .statistics-panel-container.open {
-    transform: translateX(0%); /* Görünür yap */
+    transform: translateX(100%); /* Görünür yap */
   }
   
   

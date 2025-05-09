@@ -5,13 +5,12 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1; /* Ebeveynindeki (statistics-panel-container) padding'i hesaba katarak kalan tüm alanı doldurur */
-    /* height: 100%;  Eğer ebeveyninde padding varsa bu %100 tam istediğimiz gibi olmayabilir, flex-grow daha iyi. */
+    /*height: 100%; /* Eğer ebeveyninde padding varsa bu %100 tam istediğimiz gibi olmayabilir, flex-grow daha iyi. */
     /* Eğer bu wrapper'da scroll istiyorsanız: */
     /* overflow-y: auto; */
     /* Ve ebeveynindeki (statistics-panel-container) overflow-y: auto; kaldırılır. */
+    align-items: stretch;
   }
-  
-  /* .statistics-panel-container {} // Bu boş bloğu kaldırın */
   
   .statistics-panel-title {
     font-size: 1.3rem;
@@ -40,6 +39,13 @@
     flex-shrink: 0; /* Item'ların küçülmemesi için */
   }
   
+  .statistics-content-wrapper h4 { /* Daha spesifik bir class vermek daha iyi olabilir */
+    flex-shrink: 0;
+    margin-top: var(--spacing-lg, 24px);
+    margin-bottom: var(--spacing-sm, 8px);
+    color: var(--text-secondary);
+    text-align: left;
+  }
   .statistic-item:last-child {
     border-bottom: none;
   }

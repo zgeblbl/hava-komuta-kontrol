@@ -12,8 +12,8 @@ const ToggleStatisticsButton = ({ isOpen, onClick }) => {
       aria-label={isOpen ? "İstatistikleri Gizle" : "İstatistikleri Göster"}
       title={isOpen ? "İstatistikleri Gizle" : "İstatistikleri Göster"}
     >
-      {isOpen ? '📊✖️' : '📊'}
-      <span className="button-text">{isOpen ? 'Kapat' : 'İstatistik'}</span>
+      {isOpen ? '📊' : '📊'}
+      <span className="button-text">{isOpen ? 'İstatistik' : 'İstatistik'}</span>
     </button>
   );
 };

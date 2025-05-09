@@ -3,9 +3,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: var(--bg-secondary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid var(--border-color);
+  z-index: 2000;
+  background:transparent;
 }
 .search-form {
   display: flex;

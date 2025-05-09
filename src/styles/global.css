@@ -51,6 +51,7 @@ body {
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid var(--military-border);
+  background-color: var(--bg-secondary-transparent, rgba(44, 67, 86, 0.5));
 }
 
 .nav-brand {
@@ -92,11 +93,9 @@ body {
 
 /* Ana içerik alanı */
 .main-content {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
 }
 
 /* Form elemanları */
@@ -205,7 +204,7 @@ button:disabled {
   }
 
   .main-content {
-    padding: 1rem;
+    
   }
 }
 
@@ -320,7 +319,6 @@ body {
 
 .main-content {
   flex: 1;
-  padding: var(--spacing-md);
 }
 
 /* Form elementleri */
