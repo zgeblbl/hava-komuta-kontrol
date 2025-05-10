@@ -1,37 +1,14 @@
-import React, { useEffect, useRef } from 'react';
-import '../styles/AircraftInfoPopup.css'; 
+// src/components/flightcontrol/AircraftInfoPopup.js (veya FlightDetailPanel.js)
+import React from 'react'; // useEffect ve useRef artık burada gerekmeyebilir
+import '../styles/AircraftInfoPopup.css'; // CSS dosyasının adını da değiştirebilirsiniz
 
-const AircraftInfoPopup = ({ flight, onClose, position /*, theme */ }) => {
-  const popupRef = useRef(null);
+const AircraftInfoPopup = ({ flight, onClose, onToggleRoute, isRouteVisible }) => {
+  // Artık popupRef ve dışarı tıklama useEffect'ine ihtiyacımız yok,
+  // çünkü panel sabit ve görünürlüğü selectedFlight state'i ile yönetiliyor.
+  // Pozisyonlama CSS ile yapılacak.
 
-  useEffect(() => {
-    // Popup açıldığında görünür yap ve pozisyonla
-    if (flight && popupRef.current) {
-      popupRef.current.style.opacity = '1';
-      popupRef.current.style.transform = 'scale(1)'; // Veya pozisyona göre translate
-      // Pozisyonu ayarla (FlightControlPage'den geliyor)
-      popupRef.current.style.left = `${position.x}px`;
-      popupRef.current.style.top = `${position.y}px`;
-
-      // Dışarı tıklandığında kapatmak için event listener
-      const handleClickOutside = (event) => {
-        if (popupRef.current && !popupRef.current.contains(event.target)) {
-          onClose();
-        }
-      };
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    } else if (popupRef.current) {
-      // Kapanırken animasyon için
-      popupRef.current.style.opacity = '0';
-      popupRef.current.style.transform = 'scale(0.95)';
-    }
-  }, [flight, onClose, position]);
-
-  if (!flight) {
-    return null;
+  if (!flight) { // Eğer seçili uçak yoksa, paneli render etme (veya CSS ile gizle)
+    return <div className="flight-detail-panel closed"></div>; // Veya null döndür
   }
 
   const formatTime = (isoString) => {
@@ -43,29 +20,37 @@ const AircraftInfoPopup = ({ flight, onClose, position /*, theme */ }) => {
     }
   };
 
-  // Dinamik durum sınıfı
   const statusClass = `popup-status status-${flight.status || 'unknown'}`;
 
   return (
-    <div
-      ref={popupRef}
-      className="aircraft-info-popup"
-      // style={{ left: `${position.x}px`, top: `${position.y}px` }} // useEffect içinde ayarlanıyor
-    >
-      <div className="popup-header">
-        <div>
-          <h3 className="popup-callsign">{flight.callsign || flight.id}</h3>
-          <p className="popup-model">{flight.model}</p>
+    // Ana sarmalayıcıya panelin açık/kapalı durumuna göre class ekleyelim
+    <div className={`flight-detail-panel ${flight ? 'open' : 'closed'}`}>
+      <div className="panel-header">
+        <div className="flight-titles">
+          <h3 className="panel-callsign">{flight.callsign || flight.id}</h3>
+          <p className="panel-model">{flight.model}</p>
         </div>
-        <button className="popup-close-btn" onClick={onClose} aria-label="Kapat">
-          ×
+        <button className="panel-close-btn" onClick={onClose} aria-label="Paneli Kapat">
+          × {/* Çarpı işareti */}
         </button>
       </div>
-      <dl className="popup-content">
+
+      <div className="panel-actions">
+        <button 
+          className={`btn-panel-action ${isRouteVisible ? 'active' : ''}`}
+          onClick={() => onToggleRoute(flight.id)}
+          disabled={!flight.track || flight.track.length < 2} // Rota yoksa veya tek noktaysa butonu disable et
+        >
+          {isRouteVisible ? 'Rotayı Gizle' : 'Rotayı Göster'}
+        </button>
+        {/* Diğer aksiyon butonları buraya eklenebilir */}
+      </div>
+
+      <dl className="panel-content">
         {flight.origin && flight.destination && (
           <>
             <dt>Rota:</dt>
-            <dd className="popup-route">{flight.origin} → {flight.destination}</dd>
+            <dd className="panel-route-text">{flight.origin} → {flight.destination}</dd>
           </>
         )}
         <dt>İrtifa:</dt>
@@ -95,8 +80,6 @@ const AircraftInfoPopup = ({ flight, onClose, position /*, theme */ }) => {
             </>
         )}
       </dl>
-      {/* Opsiyonel: Daha fazla detay veya "Uçuş Detayları" butonu */}
-      {/* <button className="btn btn-secondary btn-sm">Detayları Gör</button> */}
     </div>
   );
 };

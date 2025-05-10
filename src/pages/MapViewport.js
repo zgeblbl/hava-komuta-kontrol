@@ -1,12 +1,11 @@
-import React, { useRef } from 'react';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import React, { useEffect, useRef, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 import { useSettings } from '../context/SettingsContext'; 
 import { getAircraftColorVars } from './mockFlightData'; 
 
 import '../styles/MapViewport.css'; 
-
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -17,10 +16,9 @@ L.Icon.Default.mergeOptions({
 
 const LeafletAircraftMarker = ({ flight, onClick, isSelected }) => {
   const { settings } = useSettings();
-  const theme = settings.theme || 'military';
+  const theme = settings.theme || 'military'; // Varsayılanı military veya dark olabilir
   const color = getAircraftColorVars(flight, isSelected, theme);
   
-
   const rotation = flight.heading ? flight.heading - 90 : 0;
 
   const aircraftSvgPath = flight.type === 'hava-savunma' 
@@ -46,53 +44,85 @@ const LeafletAircraftMarker = ({ flight, onClick, isSelected }) => {
     iconAnchor: [14, 14], 
   });
   
-  const markerClassName = isSelected ? 'leaflet-marker-icon selected-marker' : 'leaflet-marker-icon';
-
   return (
     <Marker
       position={[flight.latitude, flight.longitude]}
       icon={customIcon}
       eventHandlers={{
         click: (e) => {
-       
           onClick(flight, e.originalEvent); 
         },
       }}
-  
-    >
-      {/* 
-        AircraftInfoPopup'ı burada Leaflet'in kendi Popup'ı olarak kullanabiliriz
-        VEYA mevcut pop-up mekanizmamızı harita üzerinde konumlandırmaya devam edebiliriz.
-        Şimdilik, tıklama olayını yukarıya iletiyoruz, pop-up dışarıda yönetiliyor.
-      */}
-    </Marker>
+    />
   );
 };
 
+function FlightPath({ flightData, routeColor }) {
+  const map = useMap();
+  const [positions, setPositions] = useState([]);
 
-const MapViewport = ({ flights, onAircraftClick, selectedFlightId }) => {
+  useEffect(() => {
+    if (flightData && flightData.track && flightData.track.length > 1) {
+      const newPositions = flightData.track.map(p => [p.lat, p.lon]);
+      setPositions(newPositions);
+    } else {
+      setPositions([]);
+    }
+  }, [flightData, map]);
+
+  if (positions.length < 2) {
+    return null;
+  }
+
+  const pathStyle = { 
+    color: routeColor || 'var(--flight-path, rgba(0, 100, 255, 0.7))',
+    weight: 2,
+    opacity: 0.8,
+  };
+
+  return <Polyline pathOptions={pathStyle} positions={positions} />;
+}
+
+
+const MapViewport = ({ flights, onAircraftClick, selectedFlightId, routeForFlightId }) => {
   const mapRef = useRef(null);
-  const initialPosition = [39.92077, 32.85411]; // Ankara
-  const initialZoom = 6; // Türkiye'yi gösterecek genel bir zoom
+  const initialPosition = [39.92077, 32.85411];
+  const initialZoom = 6;
+
+  const { settings } = useSettings();
+  const currentTheme = settings.theme || 'military'; // Varsayılanı 'military' veya 'dark' olabilir
+
+  const flightForRoute = flights.find(f => f.id === routeForFlightId);
+
+  // Temaya göre harita tile URL'sini ve attribution'ı seç
+  let tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // Varsayılan (Light)
+  let tileAttribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+  if (currentTheme === 'dark' || currentTheme === 'military') { // Military tema için de koyu harita kullanalım
+    tileUrl = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    tileAttribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>';
+  } else if (currentTheme === 'light') {
+    // Açık tema için farklı bir seçenek (örneğin CARTO Voyager)
+    tileUrl = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+    tileAttribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>';
+    // Veya OpenStreetMap'in varsayılanı da kalabilir:
+    // tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    // tileAttribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  }
+  // İsterseniz daha fazla tema ve karşılık gelen tileUrl ekleyebilirsiniz.
 
   return (
-    // CSS için yeni class adı
     <div className="map-viewport-container-leaflet"> 
       <MapContainer 
+         key={currentTheme} // <<--- TEMA DEĞİŞTİĞİNDE HARİTAYI YENİDEN OLUŞTURMAK İÇİN KEY EKLE
          center={initialPosition} 
          zoom={initialZoom} 
          ref={mapRef} 
          style={{ height: '100%', width: '100%' }}
-         // scrollWheelZoom={true} // Fare tekerleği ile zoom'u etkinleştir/devre dışı bırak
-         // dragging={true}      // Sürüklemeyi etkinleştir/devre dışı bırak
       >
         <TileLayer
-          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          // Diğer tile layer seçenekleri (bazıları API anahtarı gerektirebilir)
-          // Koyu tema için: https://carto.com/help/building-maps/basemap-list/
-          // url='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-          // url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png' // Daha modern bir açık tema
+          attribution={tileAttribution}
+          url={tileUrl}
         />
         
         {flights.map(flight => (
@@ -103,6 +133,13 @@ const MapViewport = ({ flights, onAircraftClick, selectedFlightId }) => {
             isSelected={flight.id === selectedFlightId}
           />
         ))}
+
+        {flightForRoute && flightForRoute.track && flightForRoute.track.length > 1 && (
+          <FlightPath 
+            flightData={flightForRoute}
+            routeColor={getAircraftColorVars(flightForRoute, true, currentTheme)} 
+          />
+        )}
       </MapContainer>
     </div>
   );

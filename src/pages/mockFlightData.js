@@ -35,7 +35,13 @@ export const initialFlights = [
       altitude: 28000,
       speed: 400,
       heading: 180,
-      track: [],
+      track: [ // Örnek rota izi (gerçek haritada koordinatlar olur)
+        { lat: 41.2753, lon: 28.7519 },
+        { lat: 42.5, lon: 25.0 },
+        { lat: 45.0, lon: 20.0 },
+        { lat: 48.0, lon: 15.0 },
+        { lat: 50.0379, lon: 8.5622 }
+      ],
       latitude: 40.8983,
       longitude: 29.3092,
       status: 'scheduled',
@@ -54,7 +60,13 @@ export const initialFlights = [
       altitude: 20000,
       speed: 550,
       heading: 45,
-      track: [],
+      track: [ // Örnek rota izi (gerçek haritada koordinatlar olur)
+        { lat: 41.2753, lon: 28.7519 },
+        { lat: 42.5, lon: 25.0 },
+        { lat: 45.0, lon: 20.0 },
+        { lat: 48.0, lon: 15.0 },
+        { lat: 50.0379, lon: 8.5622 }
+      ],
       latitude: 38.2924,
       longitude: 27.1570,
       status: 'enroute',
@@ -73,7 +85,13 @@ export const initialFlights = [
       altitude: 30000,
       speed: 380,
       heading: 135,
-      track: [],
+      track: [ // Örnek rota izi (gerçek haritada koordinatlar olur)
+        { lat: 41.2753, lon: 28.7519 },
+        { lat: 42.5, lon: 25.0 },
+        { lat: 45.0, lon: 20.0 },
+        { lat: 48.0, lon: 15.0 },
+        { lat: 50.0379, lon: 8.5622 }
+      ],
       latitude: 49.4435, // Örnek harita pozisyonu
       longitude: 7.6010,  // Örnek harita pozisyonu
       status: 'enroute',
@@ -90,7 +108,13 @@ export const initialFlights = [
       altitude: 0, // Yerde
       speed: 0,
       heading: 0,
-      track: [],
+      track: [ // Örnek rota izi (gerçek haritada koordinatlar olur)
+        { lat: 41.2753, lon: 28.7519 },
+        { lat: 42.5, lon: 25.0 },
+        { lat: 45.0, lon: 20.0 },
+        { lat: 48.0, lon: 15.0 },
+        { lat: 50.0379, lon: 8.5622 }
+      ],
       latitude: 39.9208,
       longitude: 32.8541,
       status: 'active',
@@ -109,7 +133,13 @@ export const initialFlights = [
       altitude: 41000,
       speed: 500,
       heading: 300,
-      track: [],
+      track: [ // Örnek rota izi (gerçek haritada koordinatlar olur)
+        { lat: 41.2753, lon: 28.7519 },
+        { lat: 42.5, lon: 25.0 },
+        { lat: 45.0, lon: 20.0 },
+        { lat: 48.0, lon: 15.0 },
+        { lat: 50.0379, lon: 8.5622 }
+      ],
       latitude: 40.1281,
       longitude: 32.9950,
       status: 'enroute',
