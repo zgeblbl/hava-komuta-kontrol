@@ -16,11 +16,13 @@ const Login = () => {
   const mockCredentials = {
     admin: {
       email: 'admin@example.com',
-      password: 'admin123'
+      password: 'admin123',
+      id: 0 // Admin ID = 0
     },
     user: {
       email: 'user@example.com',
-      password: 'user123'
+      password: 'user123',
+      id: 1 // Regular user ID = 1
     }
   };
 
@@ -36,12 +38,20 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    // Mock giriş kontrolü
+    // Mock login validation
     if (formData.email === mockCredentials[loginType].email && 
         formData.password === mockCredentials[loginType].password) {
+      // Store token and user type (ID)
       localStorage.setItem('token', 'mock-token');
-      localStorage.setItem('userType', loginType);
-      navigate('/home');
+      localStorage.setItem('userId', mockCredentials[loginType].id);  // Store user ID
+      localStorage.setItem('userType', loginType);  // Store user type (admin/user)
+
+      // Navigate based on user type
+      if (mockCredentials[loginType].id === 0) {
+        navigate('/home');  // Admin dashboard
+      } else {
+        navigate('/home');  // Regular user dashboard
+      }
     } else {
       setError('Geçersiz e-posta veya şifre');
     }

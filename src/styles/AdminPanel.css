@@ -1,0 +1,41 @@
+.admin-panel {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--military-light);
+  border-radius: 8px;
+  border: 1px solid var(--military-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.admin-header-light {
+  color: #ccc; /* Light gray or choose a light color */
+}
+
+.admin-subtext-light {
+  color: #bbb;
+}
+
+.admin-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-btn {
+  background-color: var(--military-accent);
+  color: var(--military-text);
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+}
+
+.admin-btn:hover {
+  background-color: var(--military-highlight);
+  transform: translateY(-2px);
+}
