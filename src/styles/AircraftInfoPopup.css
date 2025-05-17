@@ -1,134 +1,1092 @@
-/* src/styles/AircraftInfoPopup.css (veya FlightDetailPanel.css) */
+/* src/styles/AircraftInfoPopup.css */
 
+/* ==================== */
+/* PANEL TEMEL YAPISI   */
+/* ==================== */
 .flight-detail-panel {
-  position: fixed; /* VEYA absolute, eğer ebeveyni (.flight-control-page) relative ise */
-  left: 0;      /* Sol kenara yasla */
-  top: 60px;    /* Navbar yüksekliği kadar aşağıdan başla */
-  width: 320px; /* Panel genişliği */
-  height: calc(100vh - 60px); /* Navbar altından ekranın sonuna kadar */
-  background-color: var(--bg-panel);
-  backdrop-filter: blur(8px);
-  border-right: 1px solid var(--border-color); /* Artık sağda border */
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Gölge sağda */
-  padding: 0; /* İç padding'i alt elemanlara bırakalım veya burada yönetelim */
-  z-index: 1010; /* Haritanın üzerinde, istatistik panelinin yanında veya üzerinde (duruma göre) */
-  color: var(--text-primary);
+  position: fixed;
+  left: 0;
+  top: 60px;
+  width: 340px;
+  height: calc(100vh - 60px);
+  background-color: var(--bg-panel, #fff);
+  border-right: 1px solid var(--border-color, #ddd);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  z-index: 1010;
+  color: var(--text-primary, #333);
   font-size: 0.9rem;
   display: flex;
-  flex-direction: column; /* İçeriği dikey sırala */
-  transition: transform 0.3s ease-in-out;
-  transform: translateX(-100%); /* Başlangıçta solda, gizli */
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateX(-100%);
+  overflow: hidden;
 }
 
 .flight-detail-panel.open {
-  transform: translateX(0%); /* Görünür yapmak için class */
+  transform: translateX(0%);
+  box-shadow: 3px 0 15px rgba(0, 0, 0, 0.15);
 }
 
 .flight-detail-panel.closed {
   transform: translateX(-100%);
-  /* Veya display: none; eğer animasyon istenmiyorsa */
 }
 
+/* ==================== */
+/* PANEL BAŞLIĞI        */
+/* ==================== */
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
-  flex-shrink: 0; /* Başlık küçülmesin */
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+  background-color: var(--bg-secondary, #f8f9fa);
+  background-image: linear-gradient(to bottom, #ffffff, #f8f9fa);
 }
 
 .flight-titles {
-  /* İsteğe bağlı */
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-callsign {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--text-primary);
+  font-size: 1.4rem;
+  font-weight: 700;
   margin: 0;
+  color: var(--text-primary, #333);
+  letter-spacing: -0.5px;
 }
 
 .panel-model {
   font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-top: 2px;
+  color: var(--text-secondary, #666);
+  margin: 3px 0 0 0;
 }
 
 .panel-close-btn {
   background: none;
   border: none;
-  color: var(--text-secondary);
-  font-size: 1.8rem; /* Biraz daha büyük */
-  line-height: 1;
+  color: var(--text-secondary, #666);
+  font-size: 1.2rem;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
-}
-.panel-close-btn:hover {
-  color: var(--text-primary);
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  width: 30px;
+  height: 30px;
 }
 
-.panel-actions {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
+.panel-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary, #333);
+  transform: scale(1.1);
+}
+
+.panel-close-btn:active {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scale(0.95);
+}
+
+/* ==================== */
+/* UÇAK RESİM GALERİSİ  */
+/* ==================== */
+.aircraft-image-container {
+  position: relative;
+  width: 100%;
+  height: 500px; /* Daha büyük resim alanı */
+  background-color: #f0f0f0;
+  background-image: linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%, #e6e6e6), 
+                    linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%, #e6e6e6);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  overflow: hidden;
+}
+
+.image-gallery {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.aircraft-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
-  gap: var(--spacing-sm);
-  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s;
+  z-index: 5;
+}
+
+.gallery-nav:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.7);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.gallery-nav.prev {
+  left: 10px;
+}
+
+.gallery-nav.next {
+  right: 10px;
+}
+
+.image-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 5px 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  z-index: 5;
+}
+
+.image-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.image-dot.active {
+  background-color: white;
+  transform: scale(1.2);
+}
+
+.image-dot:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.image-credit {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  font-size: 0.7rem;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 10px;
+  z-index: 5;
+}
+
+/* ==================== */
+/* YENİ ROTA GÖSTERİMİ  */
+/* ==================== */
+.route-display-enhanced {
+  padding: 16px;
+  background-color: var(--bg-primary, #fff);
+  border-bottom: 1px solid var(--border-color, #eee);
+  position: relative;
+}
+
+.route-display-enhanced::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  height: 2px;
+  background: linear-gradient(to right, rgba(0,123,255,0.7), rgba(0,123,255,0.7));
+  z-index: 1;
+}
+
+.route-airports {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.origin-airport, .destination-airport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 0 10px;
+}
+
+.airport-code {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--button-primary, #007bff);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  margin-bottom: 4px;
+}
+
+.airport-name {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  text-align: center;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timezone {
+  font-size: 0.7rem;
+  color: var(--text-tertiary, #999);
+  margin-top: 2px;
+}
+
+/* ==================== */
+/* ZAMAN BİLGİLERİ      */
+/* ==================== */
+.schedule-display {
+  background-color: var(--bg-secondary, #f8f9fa);
+  padding: 0;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 5px;
+  padding: 14px 16px;
+}
+
+.schedule-label {
+  font-size: 0.7rem;
+  color: var(--text-tertiary, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  grid-column: 1;
+}
+
+.origin-label {
+  grid-column: 2;
+  text-align: center;
+}
+
+.dest-label {
+  grid-column: 3;
+  text-align: center;
+}
+
+.schedule-time {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.departure-time {
+  grid-column: 2;
+}
+
+.arrival-time {
+  grid-column: 3;
+}
+
+.time {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  letter-spacing: -0.5px;
+}
+
+.schedule-label.actual {
+  grid-column: 1;
+  grid-row: 2;
+  color: var(--color-success, #28a745);
+}
+
+.time.actual, .time.estimated {
+  color: var(--color-success, #28a745);
+}
+
+.estimated-dot {
+  position: absolute;
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-success, #28a745);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: translateY(-50%) scale(0.9); opacity: 0.7; }
+  50% { transform: translateY(-50%) scale(1.1); opacity: 1; }
+  100% { transform: translateY(-50%) scale(0.9); opacity: 0.7; }
+}
+
+/* ==================== */
+/* UÇUŞ İLERLEMESİ      */
+/* ==================== */
+.flight-progress-section {
+  padding: 16px;
+  background-color: var(--bg-primary, #fff);
+  border-bottom: 1px solid var(--border-color, #eee);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.flight-progress-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-track {
+  height: 6px;
+  background-color: var(--bg-secondary, #f0f0f0);
+  border-radius: 3px;
+  position: relative;
+  margin-top: 10px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: var(--button-primary, #007bff);
+  background-image: linear-gradient(45deg, 
+                    rgba(255,255,255,.15) 25%, 
+                    transparent 25%, 
+                    transparent 50%, 
+                    rgba(255,255,255,.15) 50%, 
+                    rgba(255,255,255,.15) 75%, 
+                    transparent 75%, 
+                    transparent);
+  background-size: 20px 20px;
+  border-radius: 3px;
+  transition: width 1s ease;
+  animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+  from { background-position: 20px 0; }
+  to { background-position: 0 0; }
+}
+
+.progress-plane {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 1s ease;
+  z-index: 2;
+}
+
+.plane-icon {
+  color: var(--button-primary, #007bff);
+  font-size: 18px;
+  transform: rotate(90deg);
+  animation: fly 3s infinite;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+@keyframes fly {
+  0%, 100% { transform: rotate(90deg) translateY(0); }
+  50% { transform: rotate(90deg) translateY(-2px); }
+}
+
+.route-dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.route-dot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--button-primary, #007bff);
+  z-index: 1;
+}
+
+.route-dot.origin {
+  left: 0;
+}
+
+.route-dot.destination {
+  right: 0;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.progress-time, .progress-distance, .progress-remaining {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-labels .label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.progress-labels .value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.progress-remaining .value {
+  color: var(--button-primary, #007bff);
+  position: relative;
+  animation: glow 2s infinite;
+}
+
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 0 rgba(0,123,255,0); }
+  50% { text-shadow: 0 0 5px rgba(0,123,255,0.3); }
+}
+
+.flight-status-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-color-light, #eee);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detail-item .detail-label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #999);
+  margin-bottom: 4px;
+}
+
+.detail-item .detail-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+/* ==================== */
+/* PANEL BUTONLARI      */
+/* ==================== */
+.panel-actions {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color, #eee);
+  display: flex;
+  gap: 10px;
 }
 
 .btn-panel-action {
-  flex-grow: 1; /* Butonlar eşit genişlikte olsun */
-  background-color: var(--button-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius);
-  font-size: 0.85rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--bg-secondary, #f5f5f5);
+  color: var(--text-primary, #333);
+  border: 1px solid var(--border-color, #ddd);
+  padding: 9px 14px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
-.btn-panel-action:hover {
-  background-color: var(--button-secondary-hover);
+
+.btn-panel-action:hover:not(:disabled) {
+  background-color: var(--bg-hover, #e9e9e9);
+  border-color: var(--border-color-dark, #ccc);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+
+.btn-panel-action:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
 .btn-panel-action:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .btn-panel-action.active {
-  background-color: var(--button-primary);
-  color: white; /* Veya var(--text-on-button-primary) */
-  border-color: var(--button-primary);
+  background-color: var(--button-primary, #007bff);
+  color: white;
+  border-color: var(--button-primary-dark, #0069d9);
 }
 
+.btn-panel-action.active:hover {
+  background-color: var(--button-primary-dark, #0069d9);
+}
 
-.panel-content { /* Uçuş detaylarının olduğu <dl> listesi */
-  padding: var(--spacing-md);
-  overflow-y: auto; /* Eğer içerik taşarsa bu kısım scroll etsin */
-  flex-grow: 1; /* Kalan tüm dikey alanı bu içerik doldursun */
-  display: grid; /* Grid yapısı aynı kalabilir */
-  grid-template-columns: auto 1fr;
-  gap: var(--spacing-sm) var(--spacing-md);
+/* ==================== */
+/* DETAY AKORDİYONLARI  */
+/* ==================== */
+.details-accordion {
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary-light, #fcfcfc);
+}
+
+.accordion-section {
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background-color: var(--bg-secondary, #f8f9fa);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.section-header:hover {
+  background-color: var(--bg-hover, #f1f1f1);
+  color: var(--text-primary, #444);
+}
+
+.section-header:not(.collapsed) {
+  border-left-color: var(--button-primary, #007bff);
+  color: var(--button-primary, #007bff);
+}
+
+.section-header .toggle-icon {
+  margin-left: auto;
+  transition: transform 0.3s;
+  color: var(--text-tertiary, #999);
+}
+
+.section-header:hover .toggle-icon {
+  color: var(--text-secondary, #666);
+}
+
+.section-content {
+  padding: 8px 16px;
+  background-color: var(--bg-primary, #fff);
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+.section-content.collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color-light, rgba(0,0,0,0.05));
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+  padding-right: 20px;
+}
+
+.detail-value {
+  font-weight: 500;
+  color: var(--text-primary, #333);
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.detail-value.highlight {
+  color: var(--button-primary, #007bff);
+  font-weight: 600;
+}
+
+.detail-value.center {
+  text-align: center;
+  width: 100%;
+  color: var(--text-secondary, #666);
+  font-style: italic;
+  max-width: 100%;
+}
+
+/* ==================== */
+/* DURUM ROZETLERI      */
+/* ==================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  min-width: 80px;
+}
+
+.status-badge.status-active, 
+.status-badge.status-enroute {
+  background-color: rgba(40, 167, 69, 0.15);
+  color: var(--color-success, #28a745);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-badge.status-landed {
+  background-color: rgba(23, 162, 184, 0.15);
+  color: var(--color-info, #17a2b8);
+  border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+.status-badge.status-scheduled {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: var(--color-warning, #ffc107);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-badge.status-delayed,
+.status-badge.status-diverted {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: var(--color-danger, #dc3545);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.status-badge.status-unknown {
+  background-color: rgba(108, 117, 125, 0.15);
+  color: var(--color-secondary, #6c757d);
+  border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+/* ==================== */
+/* EK BİLGİ ALTBILGISI  */
+/* ==================== */
+.flight-additional-info {
+  padding: 10px 16px;
+  background-color: var(--bg-secondary, #f8f9fa);
+  border-top: 1px solid var(--border-color, #eee);
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-/* dt, dd, panel-route-text, popup-status (panel-status olarak yeniden adlandırılabilir) için stiller
-   bir önceki CSS'ten büyük ölçüde aynı kalabilir. Sadece class isimlerini
-   .popup-* yerine .panel-* olarak güncelleyebilirsiniz tutarlılık için.
-*/
-.panel-content dt {
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-align: right;
+.data-source {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.panel-content dd {
-  margin-left: 0;
-  font-weight: normal;
-  color: var(--text-primary);
-  word-break: break-word;
+
+.data-source svg {
+  color: var(--button-primary, #007bff);
+  opacity: 0.8;
 }
-.panel-route-text { /* Eskiden .popup-route idi */
-  font-weight: bold;
+
+.flight-updated-at {
+  font-style: italic;
+  font-size: 0.75rem;
 }
-.popup-status { /* Bu class adı kalabilir veya panel-status yapabilirsiniz */
-  /* ... stiller aynı ... */
+
+/* ==================== */
+/* HAVA DURUMU MESAJI   */
+/* ==================== */
+.weather-message {
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==================== */
+/* DUYARLI TASARIM      */
+/* ==================== */
+@media (max-width: 480px) {
+  .flight-detail-panel {
+    width: 90%;
+    max-width: 340px;
+  }
+  
+  .airport-code {
+    font-size: 1.5rem;
+  }
+  
+  .time {
+    font-size: 1.1rem;
+  }
+  
+  .panel-callsign {
+    font-size: 1.2rem;
+  }
+  
+  .aircraft-image-container {
+    height: 180px;
+  }
+
+  .gallery-nav {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .schedule-grid {
+    gap: 3px;
+    padding: 10px 12px;
+  }
+
+  .flight-progress-section {
+    padding: 12px;
+  }
+
+  .flight-status-details {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .detail-item {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .detail-item .detail-label {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .flight-detail-panel {
+    width: 100%;
+  }
+  
+  .panel-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-panel-action {
+    width: 100%;
+  }
+  
+  .airport-code {
+    font-size: 1.3rem;
+  }
+
+  .aircraft-image-container {
+    height: 150px;
+  }
+
+  .progress-labels {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .progress-time, .progress-distance, .progress-remaining {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* ==================== */
+/* ANİMASYONLAR         */
+/* ==================== */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.flight-detail-panel.open {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.section-content:not(.collapsed) {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Plane animation for progress bar */
+@keyframes bobUpDown {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 3px)); }
+}
+
+/* Pulsing effect for ETA */
+@keyframes pulseBorder {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(0, 123, 255, 0); }
+}
+
+/* ==================== */
+/* ÖZEL KAYDIRMA ÇUBUĞU */
+/* ==================== */
+.details-accordion::-webkit-scrollbar {
+  width: 8px;
+}
+
+.details-accordion::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #f8f9fa);
+}
+
+.details-accordion::-webkit-scrollbar-thumb {
+  background-color: var(--border-color, #ddd);
+  border-radius: 4px;
+  border: 2px solid var(--bg-secondary, #f8f9fa);
+}
+
+.details-accordion::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary, #999);
+}
+
+/* ==================== */
+/* HOVER ETKİLERİ       */
+/* ==================== */
+.detail-row:hover {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+.detail-row:hover .detail-label,
+.detail-row:hover .detail-value:not(.highlight) {
+  color: var(--text-primary-dark, #222);
+}
+
+.airport-code:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* ==================== */
+/* TEMALAR İÇİN DESTEK  */
+/* ==================== */
+/* Koyu tema için değişkenler ve geçersiz kılmalar */
+@media (prefers-color-scheme: dark) {
+  .flight-detail-panel {
+    --bg-panel: #1a1a1a;
+    --bg-primary: #222;
+    --bg-secondary: #2a2a2a;
+    --bg-secondary-light: #252525;
+    --bg-hover: #333;
+    --text-primary: #f0f0f0;
+    --text-secondary: #c0c0c0;
+    --text-tertiary: #888;
+    --border-color: #444;
+    --border-color-light: rgba(255,255,255,0.05);
+    --button-primary-dark: #0056b3;
+    
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .flight-detail-panel.open {
+    box-shadow: 3px 0 15px rgba(0, 0, 0, 0.4);
+  }
+  
+  .aircraft-image-container {
+    background-color: #2a2a2a;
+    background-image: linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), 
+                      linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333);
+  }
+  
+  .panel-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .status-badge {
+    border-color: transparent;
+  }
+  
+  .progress-track {
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+  }
+  
+  .detail-row:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+  
+  .section-header:not(.collapsed) {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+
+  .route-display-enhanced::after {
+    background: linear-gradient(to right, rgba(0,123,255,0.5), rgba(0,123,255,0.5));
+  }
+
+  .origin-airport, .destination-airport {
+    background-color: var(--bg-primary, #222);
+  }
+
+  .progress-fill {
+    background-color: var(--button-primary, #0d6efd);
+  }
+
+  .estimated-dot {
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+  }
+}
+
+/* ======================= */
+/* GENEL KULLANICI DENEYİMİ */
+/* ======================= */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--button-primary, #007bff);
+  outline-offset: 2px;
+}
+
+.interactive-element {
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive-element::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: currentColor;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: inherit;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.interactive-element:active::after {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.1;
+}
+
+/* Dokunmatik arayüzler için ek stilller */
+@media (hover: none) {
+  .btn-panel-action {
+    padding: 12px 14px;
+  }
+  
+  .panel-close-btn {
+    padding: 10px;
+  }
+}
+
+/* ==================== */
+/* YAZDIRMA BİÇİMİ      */
+/* ==================== */
+@media print {
+  .flight-detail-panel {
+    position: static;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    border: 1px solid #ddd;
+    box-shadow: none;
+    overflow: visible;
+  }
+  
+  .panel-actions,
+  .gallery-nav,
+  .panel-close-btn,
+  .toggle-icon,
+  .image-dots {
+    display: none !important;
+  }
+  
+  .section-content {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  .section-content.collapsed {
+    max-height: none !important;
+    padding: 8px 16px !important;
+    display: block !important;
+  }
+  
+  .status-badge {
+    border: 1px solid #ddd;
+    background-color: transparent !important;
+  }
+  
+  .details-accordion {
+    overflow: visible;
+  }
 }
