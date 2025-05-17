@@ -46,11 +46,11 @@ const Login = () => {
       localStorage.setItem('userId', mockCredentials[loginType].id);  // Store user ID
       localStorage.setItem('userType', loginType);  // Store user type (admin/user)
 
-      // Navigate based on user type
+      // Navigate based on user type-might be added later
       if (mockCredentials[loginType].id === 0) {
-        navigate('/home');  // Admin dashboard
+        navigate('/flight-control');
       } else {
-        navigate('/home');  // Regular user dashboard
+        navigate('/flight-control');
       }
     } else {
       setError('Geçersiz e-posta veya şifre');

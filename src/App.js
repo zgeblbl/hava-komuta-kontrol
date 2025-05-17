@@ -13,10 +13,12 @@ import { SettingsProvider } from './context/SettingsContext';
 import './styles/global.css';
 import FlightControlPage from './pages/FlightControlPage';
 import 'leaflet/dist/leaflet.css';
+import AdminUserEdit from './pages/Admin Pages/AdminUserEdit';
+import AdminAircraftEdit from './pages/Admin Pages/AdminAircraftEdit';
 
 function AppContent() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login'];
+  const hideNavbarRoutes = ['/home', '/login'];
 
   // Retrieve user ID from localStorage
   const userId = localStorage.getItem('userId');
@@ -30,10 +32,12 @@ function AppContent() {
       {!hideNavbarRoutes.includes(location.pathname.toLowerCase()) && (isAdmin ? <AdminNavbar /> : <Navbar />)}
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/admin" element={<AdminPanel />}>
             <Route path="users" element={<AdminUsers />} />
+            <Route path="users/edit/:id" element={<AdminUserEdit />} />
             <Route path="aircraft" element={<AdminAircraft />} />
+            <Route path="/admin/aircraft/edit/:id" element={<AdminAircraftEdit />} />
           </Route>
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />

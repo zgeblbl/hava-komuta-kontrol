@@ -1,0 +1,78 @@
+.admin-aircraft-edit {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 30px;
+  background-color: #1e1e2f;
+  color: #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.admin-aircraft-edit h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #ffd369;
+  text-align: center;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-form label {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+}
+
+.edit-form input,
+.edit-form select {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #2e2e42;
+  color: #ffffff;
+}
+
+.edit-form input:focus,
+.edit-form select:focus {
+  outline: 2px solid #ffd369;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.save-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.save-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.cancel-btn:hover {
+  background-color: #d32f2f;
+}

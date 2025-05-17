@@ -40,7 +40,7 @@ function Home() {
               kesintisiz izleyin. Askeri ve sivil hava sahası kontrolünde yeni nesil teknoloji.
             </p>
             <div className="hero-cta-buttons">
-              <Link to="/flight-control" className="btn btn-primary btn-hero">
+              <Link to="/login" className="btn btn-primary btn-hero">
                 <FaPlane /> Kontrol Paneline Geç
               </Link>
             </div>
