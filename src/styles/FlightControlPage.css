@@ -35,10 +35,10 @@
   /* -------- İSTATİSTİK PANELİ (Sağdan Açılır) -------- */
   .statistics-panel-container { /* Bu class'ı İstatistik Panelinin div'ine vermiştik */
     position: fixed; /* Sayfaya göre sabit */
-    top: 60px;       /* Navbar yüksekliği kadar aşağıdan başla */
+    top: 80px;       /* Navbar yüksekliği kadar aşağıdan başla */
     right: 0px;
     width: 500px;
-    height: calc(100vh - 60px); /* Navbar altından ekranın sonuna kadar */
+    height: calc(90vh); /* Navbar altından ekranın sonuna kadar */
     background-color: var(--bg-panel, rgba(240, 240, 240, 0.9)); /* Tema için --bg-panel tanımlı olmalı */
     backdrop-filter: blur(5px);
     border-left: 1px solid var(--border-color);
@@ -51,6 +51,7 @@
     transform: translateX(0%); /* Başlangıçta gizli (sağda) */
     display: flex;
     flex-direction: column; 
+    border-radius: 30px;
   }
   
   .statistics-panel-container.open {

@@ -5,10 +5,10 @@
 /* ==================== */
 .flight-detail-panel {
   position: fixed;
-  left: 0;
-  top: 60px;
+  left: 10px;
+  top: 80px;
   width: 340px;
-  height: calc(100vh - 60px);
+  height: calc(90vh);
   background-color: var(--bg-panel, #fff);
   border-right: 1px solid var(--border-color, #ddd);
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
@@ -20,6 +20,7 @@
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transform: translateX(-100%);
   overflow: hidden;
+  border-radius: 30px;
 }
 
 .flight-detail-panel.open {
@@ -42,6 +43,7 @@
   border-bottom: 1px solid var(--border-color, #eaeaea);
   background-color: var(--bg-secondary, #f8f9fa);
   background-image: linear-gradient(to bottom, #ffffff, #f8f9fa);
+  border-radius: 30px 30px 0 0;
 }
 
 .flight-titles {
@@ -96,7 +98,7 @@
 .aircraft-image-container {
   position: relative;
   width: 100%;
-  height: 500px; /* Daha büyük resim alanı */
+  height: 300px; /* Daha büyük resim alanı - artırıldı */
   background-color: #f0f0f0;
   background-image: linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%, #e6e6e6), 
                     linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%, #e6e6e6);
@@ -204,7 +206,7 @@
 /* YENİ ROTA GÖSTERİMİ  */
 /* ==================== */
 .route-display-enhanced {
-  padding: 16px;
+  padding: 10px 16px; /* Padding'i azalttık */
   background-color: var(--bg-primary, #fff);
   border-bottom: 1px solid var(--border-color, #eee);
   position: relative;
@@ -238,27 +240,25 @@
 }
 
 .airport-code {
-  font-size: 1.8rem;
+  font-size: 1.4rem; /* Küçültüldü */
   font-weight: 700;
   color: var(--button-primary, #007bff);
   text-shadow: 0 1px 1px rgba(0,0,0,0.1);
-  margin-bottom: 4px;
+  margin-bottom: 2px; /* Azaltıldı */
 }
 
 .airport-name {
-  font-size: 0.8rem;
+  font-size: 0.75rem; /* Küçültüldü */
   color: var(--text-secondary, #666);
   text-align: center;
-  max-width: 140px;
+  max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .timezone {
-  font-size: 0.7rem;
-  color: var(--text-tertiary, #999);
-  margin-top: 2px;
+  display: none; /* Timezone gizlendi */
 }
 
 /* ==================== */
@@ -275,7 +275,7 @@
   grid-template-columns: auto 1fr 1fr;
   grid-template-rows: auto auto;
   gap: 5px;
-  padding: 14px 16px;
+  padding: 10px 16px; /* Azaltıldı */
 }
 
 .schedule-label {
@@ -356,13 +356,11 @@
   border-bottom: 1px solid var(--border-color, #eee);
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .flight-progress-bar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .progress-track {
@@ -370,7 +368,7 @@
   background-color: var(--bg-secondary, #f0f0f0);
   border-radius: 3px;
   position: relative;
-  margin-top: 10px;
+  margin: 10px 0;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
@@ -452,67 +450,13 @@
   right: 0;
 }
 
+/* Alt bilgiler kaldırıldı - sadece ilerleme çubuğu ve uçak ikonu kalacak */
 .progress-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-}
-
-.progress-time, .progress-distance, .progress-remaining {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.progress-labels .label {
-  font-size: 0.75rem;
-  color: var(--text-tertiary, #999);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 2px;
-}
-
-.progress-labels .value {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-secondary, #666);
-}
-
-.progress-remaining .value {
-  color: var(--button-primary, #007bff);
-  position: relative;
-  animation: glow 2s infinite;
-}
-
-@keyframes glow {
-  0%, 100% { text-shadow: 0 0 0 rgba(0,123,255,0); }
-  50% { text-shadow: 0 0 5px rgba(0,123,255,0.3); }
+  display: none;
 }
 
 .flight-status-details {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--border-color-light, #eee);
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.detail-item .detail-label {
-  font-size: 0.75rem;
-  color: var(--text-tertiary, #999);
-  margin-bottom: 4px;
-}
-
-.detail-item .detail-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary, #333);
+  display: none;
 }
 
 /* ==================== */
@@ -766,7 +710,7 @@
   }
   
   .airport-code {
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* Daha küçültüldü */
   }
   
   .time {
@@ -778,7 +722,7 @@
   }
   
   .aircraft-image-container {
-    height: 180px;
+    height: 220px; /* Mobilde biraz daha küçük */
   }
 
   .gallery-nav {
@@ -794,22 +738,6 @@
 
   .flight-progress-section {
     padding: 12px;
-  }
-
-  .flight-status-details {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  .detail-item {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .detail-item .detail-label {
-    margin-bottom: 0;
   }
 }
 
@@ -828,23 +756,11 @@
   }
   
   .airport-code {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .aircraft-image-container {
-    height: 150px;
-  }
-
-  .progress-labels {
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  .progress-time, .progress-distance, .progress-remaining {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
+    height: 180px;
   }
 }
 
