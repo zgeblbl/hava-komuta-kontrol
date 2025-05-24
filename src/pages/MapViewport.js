@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import AnimatedFlight from './AnimatedFlight';
 
 import { useSettings } from '../context/SettingsContext'; 
 import { getAircraftColorVars } from './mockFlightData'; 
@@ -140,6 +141,21 @@ const MapViewport = ({ flights, onAircraftClick, selectedFlightId, routeForFligh
             routeColor={getAircraftColorVars(flightForRoute, true, currentTheme)} 
           />
         )}
+        {flights.map(flight => {
+          if (!flight.track || flight.track.length < 2) return null;
+
+          const start = [flight.track[0].lat, flight.track[0].lon];
+          const end = [flight.track[flight.track.length - 1].lat, flight.track[flight.track.length - 1].lon];
+
+          return (
+            <AnimatedFlight
+              key={`animated-${flight.id}`}
+              flight={{ id: flight.id, start, end }}
+              duration={8000} // Adjust duration per flight if you want
+            />
+          );
+        })}
+
       </MapContainer>
     </div>
   );
