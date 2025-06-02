@@ -284,9 +284,9 @@ CREATE TABLE hexagons (
 
 -- USERS tablosuna örnek veriler
 INSERT INTO users (username, email, password_hash, role, is_active) VALUES
-('admin', 'admin@kk.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewfQAANMQmHBpC.m', 'admin', true),
-('operator1', 'operator1@kk.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewfQAANMQmHBpC.m', 'operator', true),
-('supervisor1', 'supervisor1@kk.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewfQAANMQmHBpC.m', 'supervisor', true);
+('admin', 'admin@kk.com', '$2a$12$m9Zw0EhtwN3iP6OVxDlDrOky7FYZiGNbdHx9y8eNmCm1MFWR9Gwi2', 'admin', true),
+('operator1', 'operator1@kk.com', '$2a$12$m9Zw0EhtwN3iP6OVxDlDrOky7FYZiGNbdHx9y8eNmCm1MFWR9Gwi2', 'operator', true),
+('supervisor1', 'supervisor1@kk.com', '$2a$12$m9Zw0EhtwN3iP6OVxDlDrOky7FYZiGNbdHx9y8eNmCm1MFWR9Gwi2', 'supervisor', true);
 
 -- UNIT tablosuna örnek veriler
 INSERT INTO unit (unit_name, unit_code, description) VALUES
