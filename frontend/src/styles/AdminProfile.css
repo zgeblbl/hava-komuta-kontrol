@@ -1,0 +1,209 @@
+.admin-profile-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--military-dark);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--military-border);
+    min-height: calc(100vh - 150px);
+}
+
+.admin-profile-container h2 {
+    color: var(--military-highlight);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--military-border);
+    padding-bottom: 1rem;
+}
+
+.profile-form, .profile-view {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-section {
+    background-color: var(--military-light);
+    padding: 1.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--military-border);
+}
+
+.form-section h3 {
+    color: var(--military-accent);
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    border-bottom: 2px solid var(--military-border);
+    padding-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--military-text);
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid var(--military-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--military-dark);
+    color: var(--military-text);
+    cursor: text;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--military-highlight);
+    box-shadow: 0 0 0 0.2rem rgba(143, 163, 176, 0.25);
+}
+
+.form-group input:hover {
+    border-color: var(--military-highlight);
+}
+
+.profile-field {
+    padding: 0.75rem;
+    border: 1px solid var(--military-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: var(--military-dark);
+    color: var(--military-text);
+    min-height: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.profile-field.readonly {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--military-border);
+    color: var(--military-text);
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.readonly-field {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--military-border) !important;
+    color: var(--military-text) !important;
+    font-weight: 500;
+    opacity: 0.8;
+    cursor: not-allowed !important;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--military-border);
+}
+
+.button-group button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.edit-button {
+    background-color: var(--military-accent);
+    color: var(--military-text);
+}
+
+.edit-button:hover {
+    background-color: var(--military-highlight);
+    transform: translateY(-1px);
+}
+
+.save-button {
+    background-color: var(--military-success);
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #3d8b40;
+    transform: translateY(-1px);
+}
+
+.cancel-button {
+    background-color: var(--military-danger);
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #c62828;
+    transform: translateY(-1px);
+}
+
+.button-group button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
+.error-message {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--military-danger);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--military-danger);
+}
+
+.success-message {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--military-success);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--military-success);
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    font-size: 1.2rem;
+    color: var(--military-text);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .admin-profile-container {
+        margin: 1rem;
+        padding: 1.5rem;
+        min-height: calc(100vh - 100px);
+    }
+
+    .admin-profile-container h2 {
+        font-size: 1.5rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+} 

@@ -1,0 +1,1018 @@
+.admin-panel {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--military-light);
+  border-radius: 8px;
+  border: 1px solid var(--military-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-height: calc(100vh - 200px);
+}
+
+.admin-panel > h2 {
+  color: var(--military-highlight);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.admin-panel > p {
+  color: var(--military-text);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.admin-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.admin-btn {
+  background-color: var(--military-accent);
+  color: var(--military-text);
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  min-width: 180px;
+  border: 2px solid transparent;
+}
+
+.admin-btn:hover {
+  background-color: var(--military-highlight);
+  transform: translateY(-2px);
+  border-color: var(--military-accent);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.admin-btn:active {
+  transform: translateY(0);
+}
+
+.admin-btn:disabled {
+  background-color: #555;
+  color: #999;
+  cursor: not-allowed;
+  transform: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Outlet container for nested routes */
+.admin-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Admin content styles for nested pages */
+.admin-content {
+  background-color: var(--military-light);
+  border-radius: 8px;
+  padding: 2rem;
+  border: 1px solid var(--military-border);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--military-border);
+}
+
+.admin-header h3 {
+  color: var(--military-highlight);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.admin-btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.admin-btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.admin-btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  margin: 0 0.25rem;
+}
+
+.admin-btn-start {
+  background-color: #28a745;
+  color: white;
+}
+
+.admin-btn-start:hover {
+  background-color: #218838;
+}
+
+.admin-btn-complete {
+  background-color: #007bff;
+  color: white;
+}
+
+.admin-btn-complete:hover {
+  background-color: #0056b3;
+}
+
+.admin-btn-abort {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.admin-btn-abort:hover {
+  background-color: #e55a00;
+}
+
+.admin-btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-btn-delete:hover {
+  background-color: #c82333;
+}
+
+.admin-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--military-dark);
+  border-radius: 6px;
+  border: 1px solid var(--military-border);
+}
+
+.admin-stats span {
+  color: var(--military-text);
+  font-weight: 500;
+}
+
+.admin-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-search, .admin-filter, .admin-input {
+  padding: 0.75rem;
+  border: 1px solid var(--military-border);
+  border-radius: 6px;
+  background-color: var(--military-dark);
+  color: var(--military-text);
+  font-size: 1rem;
+}
+
+.admin-search {
+  flex: 1;
+  min-width: 250px;
+}
+
+.admin-filter {
+  min-width: 150px;
+}
+
+.admin-table-container {
+  background-color: var(--military-dark);
+  border-radius: 8px;
+  border: 1px solid var(--military-border);
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  background-color: var(--military-accent);
+  color: var(--military-text);
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--military-border);
+}
+
+.admin-table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid var(--military-border);
+  color: var(--military-text);
+}
+
+.admin-table tr:hover {
+  background-color: rgba(103, 196, 242, 0.1);
+}
+
+.flight-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.flight-number {
+  font-weight: 600;
+  color: var(--military-highlight);
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.status-in-progress {
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.5);
+}
+
+.status-completed {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.5);
+}
+
+.status-aborted {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+/* Priority badges for flights */
+.priority-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-low {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.5);
+}
+
+.priority-medium {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.priority-high {
+  background-color: rgba(255, 123, 0, 0.2);
+  color: #ff7b00;
+  border: 1px solid rgba(255, 123, 0, 0.5);
+}
+
+.priority-critical {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  animation: priority-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes priority-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.admin-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination-info {
+  color: var(--military-text);
+  font-weight: 500;
+}
+
+.admin-form {
+  background-color: var(--military-dark);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--military-border);
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--military-text);
+  font-weight: 500;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--military-border);
+}
+
+.plan-details {
+  background-color: var(--military-accent);
+  padding: 1.5rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  border: 1px solid var(--military-border);
+}
+
+.plan-details h4 {
+  color: var(--military-highlight);
+  margin: 0 0 1rem 0;
+}
+
+.plan-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-row label {
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.info-row span {
+  color: var(--military-text);
+  font-weight: 500;
+}
+
+.info-box {
+  background-color: var(--military-dark);
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--military-border);
+  margin-top: 2rem;
+}
+
+.info-box h4 {
+  color: var(--military-highlight);
+  margin: 0 0 1rem 0;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--military-text);
+}
+
+.info-box li {
+  margin-bottom: 0.5rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--military-text);
+  font-size: 1.1rem;
+}
+
+.error-message, .success-message {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.error-message {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.success-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.no-data {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .admin-panel {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .admin-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .admin-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .admin-content {
+    padding: 1rem;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .admin-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-search {
+    min-width: auto;
+  }
+
+  .admin-table-container {
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    min-width: 600px;
+  }
+
+  .flight-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .plan-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background: var(--military-light);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  min-width: 600px;
+  border: 1px solid var(--military-border);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--military-border);
+  background: var(--military-accent);
+  color: var(--military-text);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--military-text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+  padding: 30px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: var(--military-dark);
+}
+
+.flight-plans-list .info-text {
+  background: #fff3cd;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #ffc107;
+}
+
+.no-flight-plans {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-flight-plans p {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+.modal-actions {
+  padding: 20px 30px;
+  border-top: 1px solid var(--military-border);
+  background: var(--military-light);
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.help-text {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Field error styles for form validation */
+.field-error {
+  color: #dc3545;
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.admin-input.error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+.admin-input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+/* Form section headers */
+.plan-info h4 {
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 20px 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.plan-info h4:first-child {
+  margin-top: 10px;
+}
+
+/* Success and error message improvements */
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.success-message small {
+  display: block;
+  margin-top: 8px;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Disabled button improvements */
+.admin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #6c757d !important;
+}
+
+.admin-btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Small button improvements */
+.admin-btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  margin: 0 0.15rem;
+  min-width: 32px;
+  text-align: center;
+}
+
+.admin-btn-small:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Flight actions container */
+.flight-actions {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Enhanced form groups in modal */
+.modal-body .form-group {
+  margin-bottom: 1.2rem;
+}
+
+.modal-body .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--military-text);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.modal-body .admin-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--military-border);
+  border-radius: 6px;
+  background-color: var(--military-light);
+  color: var(--military-text);
+  font-size: 1rem;
+}
+
+.modal-body .admin-input:focus {
+  border-color: var(--military-highlight);
+  box-shadow: 0 0 0 2px rgba(103, 196, 242, 0.25);
+  outline: none;
+}
+
+.modal-body small {
+  color: #888;
+  font-style: italic;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Flight Detail Page Styles */
+.flight-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-card {
+  background: var(--military-light);
+  border: 1px solid var(--military-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background: var(--military-accent);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--military-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h4 {
+  margin: 0;
+  color: var(--military-text);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.status-info {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item label {
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.info-item span {
+  color: var(--military-text);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Time Schedule Styles */
+.time-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--military-dark);
+  border-radius: 6px;
+  border: 1px solid var(--military-border);
+}
+
+.time-row.actual {
+  background: rgba(103, 196, 242, 0.1);
+  border-color: var(--military-highlight);
+}
+
+.time-type {
+  font-weight: 600;
+  color: var(--military-text);
+}
+
+.time-value {
+  color: var(--military-text);
+  font-family: 'Courier New', monospace;
+}
+
+/* Metrics Grid Styles */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.metric-item {
+  text-align: center;
+  background: var(--military-dark);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--military-border);
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--military-highlight);
+}
+
+/* Notes Content */
+.notes-content {
+  background: var(--military-dark);
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--military-border);
+  white-space: pre-wrap;
+  color: var(--military-text);
+  line-height: 1.6;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.action-buttons .admin-btn {
+  min-width: 140px;
+  text-align: center;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Enhanced plan details in flight forms */
+.plan-details {
+  background-color: var(--military-accent);
+  padding: 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--military-border);
+}
+
+.plan-details h4 {
+  color: var(--military-highlight);
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.plan-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.plan-info .info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.plan-info .info-row label {
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.plan-info .info-row span {
+  color: var(--military-text);
+  font-weight: 500;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .flight-detail-container {
+    gap: 1rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .status-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .time-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons .admin-btn {
+    width: 100%;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .plan-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Readonly badge for admin pages */
+.readonly-badge {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+/* Aircraft code styling */
+.aircraft-code {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9rem;
+}
+
+/* Additional styles for consistency */
+.admin-content h3 {
+  color: var(--military-highlight);
+  margin: 0;
+  font-size: 1.8rem;
+}

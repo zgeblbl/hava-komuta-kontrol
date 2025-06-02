@@ -1,0 +1,72 @@
+/* src/styles/AircraftIcon.css */
+.aircraft-icon {
+    position: absolute; /* MapViewport içinde pozisyonlanacak */
+    width: 28px; /* İkon boyutu */
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px; /* Emoji veya SVG ikonun boyutu için */
+    cursor: pointer;
+    transition: transform 0.2s ease-out, filter 0.2s ease-out;
+    border-radius: 50%; /* Seçildiğinde etrafına bir halka eklenebilir */
+    user-select: none; /* Metin seçilmesini engelle */
+  }
+  
+  .aircraft-icon:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+  }
+  
+  .aircraft-icon.selected {
+    transform: scale(1.3);
+    /* --aircraft-selected CSS değişkeni ile renk zaten JS'ten geliyor olacak. */
+    /* Gerekirse burada ek bir vurgu eklenebilir, örneğin bir dış çizgi (outline) veya gölge */
+    /* box-shadow: 0 0 0 3px var(--aircraft-selected-highlight, rgba(255, 255, 255, 0.7)); */
+    /* --aircraft-selected-highlight değişkenini temanıza ekleyebilirsiniz. */
+    z-index: 10; /* Seçili ikon diğerlerinin üzerinde olsun */
+  }
+  
+  /* Uçağın yönünü göstermek için (SVG kullanılıyorsa veya emoji'yi döndürmek için) */
+  .aircraft-icon svg,
+  .aircraft-icon span /* Emoji için */ {
+    display: block;
+    transition: transform 0.3s linear; /* Yön değiştiğinde yumuşak dönüş */
+  }
+  
+  /* İkonun içindeki etiket (örn: çağrı kodu) */
+  .aircraft-label {
+    position: absolute;
+    bottom: -20px; /* İkonun altında */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 2px 6px;
+    border-radius: var(--border-radius);
+    font-size: 10px;
+    white-space: nowrap;
+    opacity: 0; /* Varsayılan olarak gizli */
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none; /* Tıklamayı engellemesin */
+  }
+  
+  .aircraft-icon:hover .aircraft-label {
+    opacity: 1; /* Hover'da etiketi göster */
+  }
+  
+  .aircraft-icon.selected .aircraft-label {
+    opacity: 1; /* Seçiliyken de etiketi göster */
+    font-weight: bold;
+  }
+  
+  /* Hava Savunma Sistemi için farklı bir ikon şekli olabilir */
+  .aircraft-icon.defense-system-icon {
+    /* Örnek: Kare veya farklı bir sembol */
+    /* font-size: 24px; */ /* Farklı bir emoji veya SVG için */
+    /* border-radius: 4px; */
+  }
+  .aircraft-icon.defense-system-icon::before {
+    /* content: '🛡️'; */ /* Kalkan emojisi veya başka bir SVG */
+    /* Alternatif olarak JS'te farklı bir innerHTML ayarlanabilir. */
+  }
