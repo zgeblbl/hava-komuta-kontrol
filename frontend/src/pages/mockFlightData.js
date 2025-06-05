@@ -1,4 +1,4 @@
-export const initialFlights = [
+/*export const initialFlights = [
     {
       id: 'THY123',
       callsign: 'TK123',
@@ -148,108 +148,72 @@ export const initialFlights = [
       isDefenseSystem: false,
     }
   ];
-  
-  // Uçak tiplerine göre renkleri belirlemek için bir yardımcı fonksiyon
-  // Bu fonksiyon AircraftIcon bileşeninde kullanılacak.
-  export const getAircraftColorVars = (flight, isSelected, theme) => {
-    // Slayt 2'deki renkler öncelikli.
-    // Tema bilgisini de alarak global.css'deki değişken isimlerini döndüreceğiz.
-  
-    // 1. Koyu Tema (Dark Mode) – Uçuş Takip Uygamaları İçin İdeal
-    //    Vurgulu Renkler:
-    //    Uçak ikonu: #00BFFF (açık mavi) veya #FFD700 (altın sarısı) -> --aircraft-default
-    //    Seçili uçak: #FF4500 (turuncu-kırmızı) -> --aircraft-selected
-    //    Hava savunma sistemleri: #DC143C (koyu kırmızı) -> --defense-system (global.css'de böyle adlandırdım)
-    //    Müttefik uçak: #32CD32 (lime yeşili) -> --aircraft-ally (global.css'de böyle adlandırdım)
-  
-    // 2. Açık Tema (Light Mode)
-    //    Uçak ikonu: #007BFF (mavi) veya #FFA500 (turuncu) -> --aircraft-default
-    //    Seçili uçak: #FF0000 (kırmızı) -> --aircraft-selected
-    //    (Hava savunma ve müttefik için Light Mode'da özel renk belirtilmemiş, Dark Mode'dakileri kullanabiliriz veya global.css'deki light tema default'larını)
-  
-    // Bonus: Uçaklara Göre Renk Kategorileri (global.css'e eklenmeli)
-    //    Sivil uçak: #2196F3 (mavi) -> --aircraft-sivil
-    //    Askeri uçak: #F44336 (kırmızı) -> --aircraft-askeri
-    //    VIP/Devlet uçakları: #9C27B0 (mor) -> --aircraft-vip
-    //    Müttefik uçak: #4CAF50 (yeşil) -> Bu, Dark Mode'daki #32CD32 ile çakışıyor. Slayttaki tema renkleri öncelikli olmalı.
-  
-    // global.css'deki tema değişkenlerini kullanalım:
-    // :root[data-theme="dark"] { --aircraft-default: #00BFFF; --aircraft-selected: #FF4500; --aircraft-ally: #32CD32; --defense-system: #DC143C; }
-    // :root[data-theme="light"] { --aircraft-default: #007BFF; --aircraft-selected: #FF0000; --aircraft-ally: #32CD32; /* Light için belirtilmemiş, dark ile aynı olabilir */ --defense-system: #DC143C; /* Light için belirtilmemiş, dark ile aynı olabilir */ }
-    // :root[data-theme="military"] { --aircraft-default: #90EE90; --aircraft-selected: #FF6B6B; --aircraft-ally: #98FB98; --defense-system: #FF4444; }
-  
-    // Bonus renkler için de CSS değişkenleri tanımlamış olalım (global.css'e eklenecek)
-    // :root { --aircraft-sivil-bonus: #2196F3; --aircraft-askeri-bonus: #F44336; --aircraft-vip-bonus: #9C27B0; --aircraft-muttefik-bonus: #4CAF50; }
-  
-    if (isSelected) {
-      return 'var(--aircraft-selected)';
-    }
-  
-    // Öncelik: Hava Savunma Sistemi mi?
-    if (flight.type === 'hava-savunma' || flight.isDefenseSystem) {
-      return 'var(--defense-system)';
-    }
-  
-    // Öncelik: Müttefik mi? (Slayt Dark Mode'a göre)
-    if (flight.type === 'muttefik' || (flight.isAlly && flight.type !== 'askeri' && flight.type !== 'vip')) { // Kendi askeri/vip'si müttefikten farklı renkte olabilir
-      // Eğer tema Dark ise slayttaki özel rengi (lime yeşili) kullan.
-      // Light ve Military için global.css'deki --aircraft-ally yeterli.
-      // Ancak global.css'de tüm temalar için --aircraft-ally tanımlı, bu yüzden direkt onu kullanabiliriz.
-      return 'var(--aircraft-ally)';
-    }
-    
-    // Bonus Kategoriler (Eğer slayttaki Dark/Light mode öncelikleri yoksa)
-    // Bu kısım global.css'e eklenmeli veya mevcut --aircraft-default'u override etmeli.
-    // Şimdilik, eğer `type` bonus kategorilerden biriyse, o rengi kullanalım.
-    // global.css'e bu değişkenleri eklediğinizi varsayıyorum (örneğin --aircraft-sivil-color)
-    // Veya bunları global.css'deki temaların içine yedirebilirsiniz.
-    // Örn: :root[data-theme="dark"] { --aircraft-sivil: #2196F3; ... }
-    // Şimdilik daha basit bir mantık:
-  
-    if (flight.type === 'sivil') {
-      // Slaytta sivil için özel bir renk belirtilmemiş (dark/light ana listesinde).
-      // Bonusu kullanabiliriz veya default.
-      // Eğer global.css'de temaya göre --aircraft-sivil tanımlıysa o kullanılır.
-      // Yoksa --aircraft-default kullanılır.
-      // Bu ayrımı CSS'te class'larla yapmak daha iyi olabilir.
-      // Şimdilik, bonus renk için özel bir değişken adı varsayalım.
-      return 'var(--aircraft-sivil-bonus, var(--aircraft-default))'; // Eğer --aircraft-sivil-bonus yoksa default'a düş.
-    }
-    if (flight.type === 'askeri') {
-      return 'var(--aircraft-askeri-bonus, var(--aircraft-default))';
-    }
-    if (flight.type === 'vip') {
-      return 'var(--aircraft-vip-bonus, var(--aircraft-default))';
-    }
-  
-    // Hiçbiri değilse, genel uçak ikonu rengi
+  */
+ 
+// src/mockFlightData.js
+
+// src/utils/aviationDatabase.js dosyasından başlangıç uçuşlarını import et
+// DİKKAT: Eğer aviationDatabase.js dosyası 'utils' klasöründe değil de
+// direkt 'src' altında ise yolu './aviationDatabase' olarak değiştirin.
+import { initialFlights as generatedInitialFlights } from './aviationDatabase';
+
+// 1. Başlangıç Uçuşları
+// aviationDatabase.js'den (içindeki flightDataGenerator mantığıyla) gelen başlangıç uçuşlarını kullanıyoruz.
+export const initialFlights = generatedInitialFlights;
+
+/**
+ * Uçak ikonları için CSS renk değişkenlerini döndürür.
+ * @param {object} flight - Uçuş objesi (aviationDatabase.js/generateRandomFlight'tan gelen yapıya uygun)
+ * @param {boolean} isSelected - Uçağın seçili olup olmadığı
+ * @param {string} theme - Aktif tema (Bu parametre doğrudan kullanılmıyor, CSS değişkenleri temaya göre ayarlı)
+ * @returns {string} - CSS renk değişkeni (örn: 'var(--aircraft-sivil)')
+ */
+export const getAircraftColorVars = (flight, isSelected, theme) => {
+  if (!flight || typeof flight.type === 'undefined') {
     return 'var(--aircraft-default)';
-  };
-  
-  // Bonus renkleri global.css'e eklemeniz gerekecek:
-  /*
-  :root {
-    --aircraft-sivil-bonus: #2196F3;
-    --aircraft-askeri-bonus: #F44336;
-    --aircraft-vip-bonus: #9C27B0;
-    // --aircraft-muttefik-bonus: #4CAF50; // Bu zaten --aircraft-ally ile yönetiliyor olabilir.
   }
-  */
-  // VEYA daha iyisi, bu bonus renkleri doğrudan tema tanımlarınızın içine yedirin:
-  /*
-  :root[data-theme="dark"] {
-    ...
-    --aircraft-sivil: var(--aircraft-sivil-bonus); // veya #2196F3;
-    --aircraft-askeri: var(--aircraft-askeri-bonus); // veya #F44336;
-    --aircraft-vip: var(--aircraft-vip-bonus);       // veya #9C27B0;
+
+  if (isSelected) {
+    return 'var(--aircraft-selected)';
   }
-  :root[data-theme="light"] {
-    ...
-    --aircraft-sivil: var(--aircraft-sivil-bonus);
-    --aircraft-askeri: var(--aircraft-askeri-bonus);
-    --aircraft-vip: var(--aircraft-vip-bonus);
+
+  if (flight.isDefenseSystem || flight.type === 'hava-savunma') {
+    return 'var(--defense-system)';
   }
-  etc.
-  */
-  // Bu durumda getAircraftColorVars içinde sadece type'a göre ilgili değişkeni (örn: var(--aircraft-sivil)) döndürmek yeterli olur.
-  // Şimdilik yukarıdaki fallbackli yapıyı bırakıyorum.
+
+  switch (flight.type.toLowerCase()) {
+    case 'sivil':
+      return 'var(--aircraft-sivil)';
+    case 'askeri':
+      return 'var(--aircraft-askeri)';
+    case 'vip':
+      return 'var(--aircraft-vip)';
+    case 'muttefik':
+      return 'var(--aircraft-ally)';
+    default:
+      return 'var(--aircraft-default)';
+  }
+};
+
+// ÖRNEK CSS Değişkenleri (global.css veya tema dosyanıza eklenmeli)
+/*
+:root[data-theme="dark"] {
+  --aircraft-default: #00BFFF;
+  --aircraft-selected: #FF4500;
+  --aircraft-sivil: #64B5F6;
+  --aircraft-askeri: #E57373;
+  --aircraft-vip: #BA68C8;
+  --aircraft-ally: #32CD32;
+  --defense-system: #DC143C;
+
+  --flight-path-default: rgba(0, 191, 255, 0.6);
+  --flight-path-selected: rgba(255, 69, 0, 0.9);
+
+  --airport-icon-international: rgba(100, 150, 255, 0.9);
+  --airport-icon-domestic: rgba(150, 200, 100, 0.9);
+  --airport-icon-military: rgba(255, 100, 100, 0.9);
+  --airport-icon-other: rgba(180, 180, 180, 0.8);
+}
+
+// Diğer temalar (light, military) için de benzer değişkenler tanımlanmalı.
+*/

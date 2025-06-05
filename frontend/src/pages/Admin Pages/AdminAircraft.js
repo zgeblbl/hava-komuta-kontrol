@@ -1,116 +1,126 @@
-// pages/Admin Pages/AdminAircraft.js
-import React, { useState, useEffect } from 'react';
-import { aircraftService } from '../../services/api';
+// src/pages/Admin Pages/AdminAircraft.js
+import React, { useState, useEffect, useMemo } from 'react';
+import { subscribeFlights } from '../FlightControlPage';   // path’i proje yapınıza göre ayarlayın
 import '../../styles/AdminPanel.css';
 
-const AdminAircraft = () => {
-  const [aircrafts, setAircrafts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalAircraft, setTotalAircraft] = useState(0);
-
-  useEffect(() => {
-    fetchAircraft();
-  }, [currentPage, filterStatus]);
-
-  const fetchAircraft = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const status = filterStatus === 'all' ? null : filterStatus;
-      const response = await aircraftService.getAircraft(currentPage, pageSize, status);
-      
-      setAircrafts(response.aircrafts || []);
-      setTotalPages(response.meta?.total_page || 1);
-      setTotalAircraft(response.meta?.total || 0);
-    } catch (err) {
-      setError(err || 'Uçaklar yüklenirken bir hata oluştu');
-      console.error('Error fetching aircraft:', err);
-    } finally {
-      setLoading(false);
-    }
+// Flight nesnesini tabloya uygun “aircraft” şekline dönüştür
+const mapFlightToAircraft = (flight) => {
+  const statusMap = {
+    enroute:   'ACTIVE',
+    scheduled: 'STANDBY',
+    delayed:   'MAINTENANCE',
+    landed:    'GROUNDED',
+    active:    'ACTIVE'
   };
+  return {
+    id: flight.id,
+    code: flight.callsign,
+    tail_number: flight.id.split('-')[0],
+    model: flight.model,
+    manufacturer: (flight.type || '').toUpperCase(),
+    year_manufactured: '-',
+    status: statusMap[flight.status] || 'UNKNOWN',
+    current_location: {
+      name: `${flight.latitude.toFixed(2)}, ${flight.longitude.toFixed(2)}`
+    },
+    updated_at: flight.estimatedArrivalTime
+  };
+};
 
-  // Client-side filtering for search
-  const filteredAircrafts = aircrafts.filter(aircraft => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      aircraft.code?.toLowerCase().includes(searchLower) ||
-      aircraft.tail_number?.toLowerCase().includes(searchLower) ||
-      aircraft.model?.toLowerCase().includes(searchLower) ||
-      aircraft.manufacturer?.toLowerCase().includes(searchLower)
-    );
+// Yardımcı sözlükler
+const STATUS_CLASS = {
+  ACTIVE:      'status-completed',
+  MAINTENANCE: 'status-pending',
+  MISSION:     'status-in-progress',
+  GROUNDED:    'status-aborted',
+  STANDBY:     'status-pending'
+};
+const STATUS_TEXT = {
+  ACTIVE:      'Aktif',
+  MAINTENANCE: 'Bakımda',
+  MISSION:     'Görevde',
+  GROUNDED:    'Yerde',
+  STANDBY:     'Hazır'
+};
+const getStatusClass = (s) => STATUS_CLASS[s] || 'status-unknown';
+const getStatusText  = (s) => STATUS_TEXT[s]  || s;
+const formatDate     = (d) => (d ? new Date(d).toLocaleDateString('tr-TR') : '-');
+
+const AdminAircraft = () => {
+  // FlightControlPage’ten gelen ham flight dizisi
+  const [flightsRaw, setFlightsRaw] = useState([]);
+  const [loading, setLoading]       = useState(true);
+
+  // Abone ol – canlı güncellemeler gelir
+  useEffect(() => {
+    const unsubscribe = subscribeFlights((flights) => {
+      setFlightsRaw(flights);
+      setLoading(false);
+    });
+    return unsubscribe;          // unmount olduğunda aboneliği kes
+  }, []);
+
+  // Arama, filtre, sayfalama
+  const [searchTerm,   setSearchTerm]   = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [currentPage,  setCurrentPage]  = useState(1);
+  const pageSize = 10;
+
+  // flights → aircrafts
+  const aircrafts = useMemo(
+    () => flightsRaw.map(mapFlightToAircraft),
+    [flightsRaw]
+  );
+
+  // Arama + durum filtresi
+  const filtered = aircrafts.filter((a) => {
+    const s = searchTerm.toLowerCase();
+    const matchSearch =
+      a.code?.toLowerCase().includes(s) ||
+      a.tail_number?.toLowerCase().includes(s) ||
+      a.model?.toLowerCase().includes(s) ||
+      a.manufacturer?.toLowerCase().includes(s);
+    const matchStatus = filterStatus === 'all' || a.status === filterStatus;
+    return matchSearch && matchStatus;
   });
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case 'ACTIVE': return 'status-completed';
-      case 'MAINTENANCE': return 'status-pending';
-      case 'MISSION': return 'status-in-progress';
-      case 'GROUNDED': return 'status-aborted';
-      case 'STANDBY': return 'status-pending';
-      default: return 'status-unknown';
-    }
-  };
+  // Sayfalama
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paged = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'ACTIVE': return 'Aktif';
-      case 'MAINTENANCE': return 'Bakımda';
-      case 'MISSION': return 'Görevde';
-      case 'GROUNDED': return 'Yerde';
-      case 'STANDBY': return 'Hazır';
-      default: return status;
-    }
-  };
-
-  const formatDateTime = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('tr-TR');
-  };
-
+  // ---------- RENDER ----------
   return (
     <div className="admin-content">
+      {/* Başlık */}
       <div className="admin-header">
-        <h3>Uçaklar (Salt Okunur)</h3>
+        <h3>Uçaklar (Canlı)</h3>
         <span className="readonly-badge">Salt Okunur Mod</span>
       </div>
 
-      {error && (
-        <div className="error-message">
-          <strong>Hata:</strong> {error}
-        </div>
-      )}
-
-      {/* Stats */}
+      {/* Özet istatistik */}
       <div className="admin-stats">
-        <span>Toplam Uçak: {totalAircraft}</span>
-        <span>Sayfa: {currentPage} / {totalPages}</span>
+        <span>Toplam Uçak: {aircrafts.length}</span>
+        <span>Sayfa: {currentPage}/{totalPages}</span>
         {filterStatus !== 'all' && <span>Durum: {getStatusText(filterStatus)}</span>}
-        {searchTerm && <span>Arama: "{searchTerm}"</span>}
+        {searchTerm && <span>Arama: “{searchTerm}”</span>}
       </div>
 
-      {/* Search and Filters */}
+      {/* Arama & filtre */}
       <div className="admin-filters">
         <input
           type="text"
-          placeholder="Uçak kodu, kuyruk no, model veya üretici ara..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
           className="admin-search"
+          placeholder="Callsign, model, üretici ara..."
+          value={searchTerm}
+          onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
         />
-
         <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
           className="admin-filter"
+          value={filterStatus}
+          onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
         >
           <option value="all">Tüm Durumlar</option>
           <option value="ACTIVE">Aktif</option>
@@ -119,22 +129,17 @@ const AdminAircraft = () => {
           <option value="MISSION">Görevde</option>
           <option value="GROUNDED">Yerde</option>
         </select>
-
         <button
-          onClick={() => {
-            setSearchTerm('');
-            setFilterStatus('all');
-            setCurrentPage(1);
-          }}
           className="admin-btn-secondary"
+          onClick={() => { setSearchTerm(''); setFilterStatus('all'); setCurrentPage(1); }}
         >
           Temizle
         </button>
       </div>
 
-      {/* Aircraft Table */}
+      {/* Tablo veya yükleniyor bildirimi */}
       {loading ? (
-        <div className="loading">Uçaklar yükleniyor...</div>
+        <div className="loading">Uçaklar yükleniyor…</div>
       ) : (
         <div className="admin-table-container">
           <table className="admin-table">
@@ -143,42 +148,38 @@ const AdminAircraft = () => {
                 <th>Kod</th>
                 <th>Kuyruk No</th>
                 <th>Model</th>
-                <th>Üretici</th>
+                <th>Üretici/Tür</th>
                 <th>Üretim Yılı</th>
                 <th>Durum</th>
                 <th>Konum</th>
                 <th>Son Güncelleme</th>
               </tr>
             </thead>
+
             <tbody>
-              {filteredAircrafts.length === 0 ? (
+              {paged.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="no-data">
-                    {searchTerm || filterStatus !== 'all' ? 
-                      'Arama kriterlerine uygun uçak bulunamadı' : 
-                      'Henüz uçak eklenmemiş'
-                    }
+                    {searchTerm || filterStatus !== 'all'
+                      ? 'Kriterlere uygun kayıt bulunamadı'
+                      : 'Uçuş bulunamadı'}
                   </td>
                 </tr>
               ) : (
-                filteredAircrafts.map((aircraft) => (
-                  <tr key={aircraft.id}>
+                paged.map((a) => (
+                  <tr key={a.id}>
+                    <td><span className="aircraft-code">{a.code}</span></td>
+                    <td>{a.tail_number}</td>
+                    <td>{a.model}</td>
+                    <td>{a.manufacturer}</td>
+                    <td>{a.year_manufactured}</td>
                     <td>
-                      <span className="aircraft-code">{aircraft.code}</span>
-                    </td>
-                    <td>{aircraft.tail_number}</td>
-                    <td>{aircraft.model}</td>
-                    <td>{aircraft.manufacturer || '-'}</td>
-                    <td>{aircraft.year_manufactured || '-'}</td>
-                    <td>
-                      <span className={`status-badge ${getStatusClass(aircraft.status)}`}>
-                        {getStatusText(aircraft.status)}
+                      <span className={`status-badge ${getStatusClass(a.status)}`}>
+                        {getStatusText(a.status)}
                       </span>
                     </td>
-                    <td>
-                      {aircraft.current_location?.name || 'Belirsiz'}
-                    </td>
-                    <td>{formatDateTime(aircraft.updated_at)}</td>
+                    <td>{a.current_location.name}</td>
+                    <td>{formatDate(a.updated_at)}</td>
                   </tr>
                 ))
               )}
@@ -187,25 +188,25 @@ const AdminAircraft = () => {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Sayfalama */}
       {totalPages > 1 && (
         <div className="admin-pagination">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
             className="admin-btn-secondary"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           >
             Önceki
           </button>
 
           <span className="pagination-info">
-            Sayfa {currentPage} / {totalPages}
+            Sayfa {currentPage}/{totalPages}
           </span>
 
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
             className="admin-btn-secondary"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           >
             Sonraki
           </button>

@@ -1,164 +1,153 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { flightService } from '../../services/api';
+import { subscribeFlights } from '../FlightControlPage';   // ← yolunuzu kontrol edin
 import '../../styles/AdminPanel.css';
+
+/* ─────────  Yardımcı sözlükler  ───────── */
+const STATUS_TR = {
+  enroute:   'Havada',
+  scheduled: 'Planlandı',
+  delayed:   'Gecikmeli',
+  landed:    'İndi',
+  active:    'Aktif',            // hava savunma
+};
+
+const STATUS_BADGE = {
+  enroute:   'status-in-progress',
+  scheduled: 'status-pending',
+  delayed:   'status-pending',
+  landed:    'status-completed',
+  active:    'status-completed',
+};
+
+const PRIORITY_TR = {
+  1: 'Düşük',
+  2: 'Orta',
+  3: 'Yüksek',
+  4: 'Kritik',
+};
+
+/* Simülasyon uçuş nesnesini tablo satırına dönüştür */
+const mapFlightRow = (f) => ({
+  id: f.id,
+  flight_number: f.callsign,
+  aircraft_model: f.model,
+  route: `${f.origin} → ${f.destination}`,
+  status: f.status,
+  priority: f.priority ?? 2,         // simülasyonda yoksa varsayılan orta
+  dep_planned: f.departureTime,
+  arr_planned: f.estimatedArrivalTime,
+  dep_actual:  null,
+  arr_actual:  null,
+  pilot: { first_name: '-', last_name: '-' }
+});
+
+/* Tarih biçimleyici */
+const fmt = (d) => (d ? new Date(d).toLocaleString('tr-TR') : '-');
 
 const AdminFlights = () => {
   const navigate = useNavigate();
-  const [flights, setFlights] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  // Pagination and filtering
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalFlights, setTotalFlights] = useState(0);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('');
 
-  // Flight statuses and priorities
-  const flightStatuses = flightService.getFlightStatuses();
-  const priorityLevels = flightService.getPriorityLevels();
+  /* 1) canlı uçuş listesi */
+  const [flightsRaw, setFlightsRaw] = useState([]);
+  const [loading, setLoading]       = useState(true);
 
+  /* abone ol */
   useEffect(() => {
-    fetchFlights();
-  }, [currentPage, statusFilter, priorityFilter]);
-
-  const fetchFlights = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      const response = await flightService.getFlights(
-        currentPage, 
-        10, 
-        statusFilter || null, 
-        priorityFilter || null
-      );
-      
-      setFlights(response.flights || []);
-      setTotalPages(response.meta.total_page);
-      setTotalFlights(response.meta.total);
-    } catch (err) {
-      console.error('Error fetching flights:', err);
-      setError(err.toString());
-    } finally {
+    const unsub = subscribeFlights((fl) => {
+      setFlightsRaw(fl.filter((f) => f.type !== 'hava-savunma')); // savunma sistemlerini hariç tut
       setLoading(false);
-    }
-  };
+    });
+    return unsub;
+  }, []);
 
-  const handleStatusFilterChange = (e) => {
-    setStatusFilter(e.target.value);
-    setCurrentPage(1);
-  };
+  /* 2) filtre state’i */
+  const [statusFilter,   setStatusFilter]   = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('');
+  const [currentPage,    setCurrentPage]    = useState(1);
+  const pageSize = 10;
 
-  const handlePriorityFilterChange = (e) => {
-    setPriorityFilter(e.target.value);
-    setCurrentPage(1);
-  };
+  /* 3) uçuşları tablo satırına dönüştür */
+  const flights = useMemo(
+    () => flightsRaw.map(mapFlightRow),
+    [flightsRaw]
+  );
 
-  const resetFilters = () => {
-    setStatusFilter('');
-    setPriorityFilter('');
-    setCurrentPage(1);
-  };
+  /* 4) filtre uygula */
+  const filtered = flights.filter((f) => {
+    const matchStatus   = !statusFilter   || f.status   === statusFilter;
+    const matchPriority = !priorityFilter || String(f.priority) === priorityFilter;
+    return matchStatus && matchPriority;
+  });
 
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case 'PLANNED':
-      case 'SCHEDULED':
-        return 'status-pending';
-      case 'IN_FLIGHT':
-      case 'TAXIING':
-      case 'TAKEOFF':
-        return 'status-in-progress';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELLED':
-      case 'ABORTED':
-      case 'EMERGENCY':
-        return 'status-aborted';
-      default:
-        return 'status-pending';
-    }
-  };
+  /* 5) sayfalama */
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paged = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
-  const getPriorityBadgeClass = (priority) => {
-    switch (priority) {
-      case 1:
-        return 'priority-low';
-      case 2:
-        return 'priority-medium';
-      case 3:
-        return 'priority-high';
-      case 4:
-        return 'priority-critical';
-      default:
-        return 'priority-low';
-    }
-  };
+  /* 6) badge class fonksiyonları */
+  const getStatusBadgeClass = (s) => STATUS_BADGE[s] || 'status-pending';
+  const getPriorityBadgeClass = (p) =>
+    ({
+      1: 'priority-low',
+      2: 'priority-medium',
+      3: 'priority-high',
+      4: 'priority-critical'
+    }[p] || 'priority-low');
 
-  const formatDateTime = (dateTimeString) => {
-    if (!dateTimeString) return '-';
-    return new Date(dateTimeString).toLocaleString('tr-TR');
-  };
-
+  /* ───────────  RENDER  ─────────── */
   return (
     <div className="admin-content">
       <div className="admin-header">
-        <h3>Uçuşlar (Salt Okunur)</h3>
+        <h3>Uçuşlar (Canlı)</h3>
         <span className="readonly-badge">Salt Okunur Mod</span>
       </div>
 
-      {error && (
-        <div className="error-message">
-          <strong>Hata:</strong> {error}
-        </div>
-      )}
-
-      {/* Stats */}
+      {/* Özet */}
       <div className="admin-stats">
-        <span>Toplam Uçuş: {totalFlights}</span>
-        <span>Sayfa: {currentPage} / {totalPages}</span>
-        {statusFilter && <span>Durum: {flightStatuses[statusFilter]}</span>}
-        {priorityFilter && <span>Öncelik: {priorityLevels[priorityFilter]}</span>}
+        <span>Toplam Uçuş: {flights.length}</span>
+        <span>Sayfa: {currentPage}/{totalPages}</span>
+        {statusFilter   && <span>Durum: {STATUS_TR[statusFilter]}</span>}
+        {priorityFilter && <span>Öncelik: {PRIORITY_TR[priorityFilter]}</span>}
       </div>
 
-      {/* Filters */}
+      {/* Filtreler */}
       <div className="admin-filters">
-        <select 
-          value={statusFilter} 
-          onChange={handleStatusFilterChange}
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
           className="admin-filter"
         >
           <option value="">Tüm Durumlar</option>
-          {Object.entries(flightStatuses).map(([key, value]) => (
-            <option key={key} value={key}>{value}</option>
+          {Object.entries(STATUS_TR).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
           ))}
         </select>
 
-        <select 
-          value={priorityFilter} 
-          onChange={handlePriorityFilterChange}
+        <select
+          value={priorityFilter}
+          onChange={(e) => { setPriorityFilter(e.target.value); setCurrentPage(1); }}
           className="admin-filter"
         >
           <option value="">Tüm Öncelikler</option>
-          {Object.entries(priorityLevels).map(([key, value]) => (
-            <option key={key} value={key}>{value}</option>
+          {Object.entries(PRIORITY_TR).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
           ))}
         </select>
 
-        <button 
-          onClick={resetFilters}
+        <button
           className="admin-btn-secondary"
+          onClick={() => { setStatusFilter(''); setPriorityFilter(''); setCurrentPage(1); }}
         >
           Filtreleri Temizle
         </button>
       </div>
 
-      {/* Flights Table */}
+      {/* Tablo ya da yükleniyor */}
       {loading ? (
-        <div className="loading">Uçuşlar yükleniyor...</div>
+        <div className="loading">Uçuşlar yükleniyor…</div>
       ) : (
         <div className="admin-table-container">
           <table className="admin-table">
@@ -169,71 +158,43 @@ const AdminFlights = () => {
                 <th>Rota</th>
                 <th>Durum</th>
                 <th>Öncelik</th>
-                <th>Kalkış</th>
-                <th>İniş</th>
-                <th>Pilot</th>
-                <th>Detaylar</th>
+                <th>Kalkış (Plan)</th>
+                <th>İniş (Plan)</th>
+                <th>Detay</th>
               </tr>
             </thead>
+
             <tbody>
-              {flights.length === 0 ? (
+              {paged.length === 0 ? (
                 <tr>
-                  <td colSpan="9" className="no-data">
-                    {statusFilter || priorityFilter ? 
-                      'Filtrelere uygun uçuş bulunamadı' : 
-                      'Henüz uçuş oluşturulmamış'
-                    }
+                  <td colSpan="8" className="no-data">
+                    {statusFilter || priorityFilter
+                      ? 'Filtrelere uygun uçuş yok'
+                      : 'Uçuş bulunamadı'}
                   </td>
                 </tr>
               ) : (
-                flights.map((flight) => (
-                  <tr key={flight.id}>
+                paged.map((f) => (
+                  <tr key={f.id}>
+                    <td><span className="flight-number">{f.flight_number}</span></td>
+                    <td>{f.aircraft_model}</td>
+                    <td>{f.route}</td>
                     <td>
-                      <span className="flight-number">{flight.flight_number}</span>
-                    </td>
-                    <td>
-                      {flight.flight_plan?.aircraft?.code || '-'}
-                    </td>
-                    <td>
-                      {flight.flight_plan?.departure_airport?.name} → {flight.flight_plan?.arrival_airport?.name}
-                    </td>
-                    <td>
-                      <span className={`status-badge ${getStatusBadgeClass(flight.status)}`}>
-                        {flightStatuses[flight.status] || flight.status}
+                      <span className={`status-badge ${getStatusBadgeClass(f.status)}`}>
+                        {STATUS_TR[f.status] || f.status}
                       </span>
                     </td>
                     <td>
-                      <span className={`priority-badge ${getPriorityBadgeClass(flight.priority)}`}>
-                        {priorityLevels[flight.priority] || flight.priority}
+                      <span className={`priority-badge ${getPriorityBadgeClass(f.priority)}`}>
+                        {PRIORITY_TR[f.priority] || f.priority}
                       </span>
                     </td>
+                    <td>{fmt(f.dep_planned)}</td>
+                    <td>{fmt(f.arr_planned)}</td>
                     <td>
-                      <div>
-                        <small>Plan: {formatDateTime(flight.scheduled_departure_time)}</small>
-                        {flight.actual_departure_time && (
-                          <div><strong>Gerçek: {formatDateTime(flight.actual_departure_time)}</strong></div>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      <div>
-                        <small>Plan: {formatDateTime(flight.scheduled_arrival_time)}</small>
-                        {flight.actual_arrival_time && (
-                          <div><strong>Gerçek: {formatDateTime(flight.actual_arrival_time)}</strong></div>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      {flight.pilot?.first_name} {flight.pilot?.last_name}
-                      {flight.co_pilot && (
-                        <div><small>Co-pilot: {flight.co_pilot.first_name} {flight.co_pilot.last_name}</small></div>
-                      )}
-                    </td>
-                    <td>
-                      <button 
-                        onClick={() => navigate(`/admin/flights/${flight.id}`)}
+                      <button
                         className="admin-btn-small admin-btn-complete"
-                        title="Detayları Görüntüle"
+                        onClick={() => navigate(`/admin/flights/${f.id}`)}
                       >
                         Detay
                       </button>
@@ -246,25 +207,25 @@ const AdminFlights = () => {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Sayfalama */}
       {totalPages > 1 && (
         <div className="admin-pagination">
-          <button 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
+          <button
             className="admin-btn-secondary"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           >
             Önceki
           </button>
-          
+
           <span className="pagination-info">
-            Sayfa {currentPage} / {totalPages}
+            Sayfa {currentPage}/{totalPages}
           </span>
-          
-          <button 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
+
+          <button
             className="admin-btn-secondary"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           >
             Sonraki
           </button>
@@ -274,4 +235,4 @@ const AdminFlights = () => {
   );
 };
 
-export default AdminFlights; 
+export default AdminFlights;

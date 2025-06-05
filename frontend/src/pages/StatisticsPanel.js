@@ -1,851 +1,887 @@
 // src/components/flightcontrol/StatisticsPanel.js
 import React, { useMemo, useState } from 'react';
-import '../styles/StatisticsPanel.css';
-import { 
-  FaPlane, FaSatelliteDish, FaLayerGroup, FaTachometerAlt, 
-  FaArrowsAltV, FaUserFriends, FaShieldAlt, FaStar, 
+import '../styles/StatisticsPanel.css'; // CSS dosyanızın yolu
+import {
+  FaPlane, FaSatelliteDish, FaLayerGroup, FaTachometerAlt,
+  FaArrowsAltV, FaUserFriends, FaShieldAlt, FaStar,
   FaBuilding, FaChartPie, FaPlaneDeparture, FaMapMarkedAlt,
   FaClock, FaFlag, FaGlobeAmericas, FaRoute, FaInfoCircle,
   FaAngleDown, FaAngleUp, FaPlaneArrival, FaExclamationTriangle
 } from 'react-icons/fa';
 
-
-
-const StatisticsPanel = ({ flights }) => {
+// onFlightClick prop'u FlightControlPage'den gelecek
+const StatisticsPanel = ({ flights, onFlightClick }) => {
   const [expandedStat, setExpandedStat] = useState(null);
   const [expandedItem, setExpandedItem] = useState({
-    type: null,  // 'flightType' veya 'flightStatus' olabilir
-    key: null    // Örn: 'sivil', 'askeri' veya 'active', 'landed' vb.
+    type: null,  // 'flightType', 'flightStatus', 'countryOrigin' olabilir
+    key: null    // Örn: 'sivil', 'askeri', 'Türkiye'
   });
-  // Gelişmiş istatistik hesaplamaları
-  const activeFlights = useMemo(() => 
-    flights.filter(f => f.status === 'enroute' || f.status === 'active').length, 
+
+  // --- İSTATİSTİK HESAPLAMALARI ---
+  const activeFlights = useMemo(() =>
+    flights.filter(f => 
+      (f.status === 'enroute' || f.status === 'active') && 
+      f.type !== 'hava-savunma'
+    ).length,
     [flights]
   );
 
-  const totalFlights = flights.length;
+  const totalFlights = useMemo(() => 
+    flights.filter(f => f.type !== 'hava-savunma').length,
+    [flights]
+  );
 
   const averageAltitude = useMemo(() => {
-    const flyingFlights = flights.filter(f => 
-      (f.status === 'enroute' || f.status === 'active') && f.altitude > 0
+    const flyingFlights = flights.filter(f =>
+      (f.status === 'enroute' || f.status === 'active') &&
+      typeof f.altitude === 'number' && f.altitude > 0 &&
+      f.type !== 'hava-savunma'
     );
     if (flyingFlights.length === 0) return 0;
     const sum = flyingFlights.reduce((acc, flight) => acc + flight.altitude, 0);
     return Math.round(sum / flyingFlights.length);
   }, [flights]);
 
+  // Hız hesaplama - groundspeed, speed, velocity alanlarını kontrol et
   const averageSpeed = useMemo(() => {
-    const flyingFlights = flights.filter(f => 
-      (f.status === 'enroute' || f.status === 'active') && f.groundspeed > 0
-    );
+    const flyingFlights = flights.filter(f => {
+      const speed = f.groundspeed || f.speed || f.velocity || 0;
+      return (f.status === 'enroute' || f.status === 'active') &&
+        typeof speed === 'number' && speed > 0 && 
+        f.type !== 'hava-savunma';
+    });
+    
     if (flyingFlights.length === 0) return 0;
-    const sum = flyingFlights.reduce((acc, flight) => acc + flight.groundspeed, 0);
+    
+    const sum = flyingFlights.reduce((acc, flight) => {
+      const speed = flight.groundspeed || flight.speed || flight.velocity || 0;
+      return acc + speed;
+    }, 0);
+    
     return Math.round(sum / flyingFlights.length);
   }, [flights]);
 
   const flightTypeCounts = useMemo(() => {
     const counts = {
-      sivil: 0,
-      askeri: 0,
-      muttefik: 0,
-      'hava-savunma': 0,
-      vip: 0,
-      diger: 0
+      sivil: 0, askeri: 0, vip: 0, muttefik: 0, 'hava-savunma': 0, diger: 0
     };
-    
     flights.forEach(flight => {
       const type = flight.type?.toLowerCase() || 'diger';
-      if (counts.hasOwnProperty(type)) {
-        counts[type]++;
-      } else {
-        counts.diger++;
-      }
+      if (counts.hasOwnProperty(type)) counts[type]++; else counts.diger++;
     });
-    
     return counts;
   }, [flights]);
 
-  // Yeni istatistikler
   const flightStatusCounts = useMemo(() => {
     const counts = {
-      active: 0,
-      landed: 0,
-      scheduled: 0,
-      delayed: 0,
-      other: 0
+      enroute: 0, scheduled: 0, landed: 0, delayed: 0, active: 0,
+      diverted: 0, unknown: 0, other: 0
     };
-    
     flights.forEach(flight => {
+      if (flight.type === 'hava-savunma') return; // Hava savunmayı atla
       const status = flight.status?.toLowerCase() || 'other';
-      if (counts.hasOwnProperty(status)) {
-        counts[status]++;
-      } else {
-        counts.other++;
-      }
+      if (counts.hasOwnProperty(status)) counts[status]++; else counts.other++;
     });
-    
     return counts;
   }, [flights]);
 
   const originCountries = useMemo(() => {
     const countries = {};
     flights.forEach(flight => {
+      if (flight.type === 'hava-savunma') return; // Hava savunmayı atla
       const country = flight.origin_country || 'Bilinmiyor';
       countries[country] = (countries[country] || 0) + 1;
     });
-    
-    // En çok uçuş olan ilk 5 ülkeyi döndür
-    return Object.entries(countries)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+    return Object.entries(countries).sort((a, b) => b[1] - a[1]).slice(0, 5);
   }, [flights]);
 
   const averageDistance = useMemo(() => {
-    const flightsWithDistance = flights.filter(f => f.distance);
+    const flightsWithDistance = flights.filter(f =>
+        typeof f.distance === 'number' && f.distance > 0 && f.type !== 'hava-savunma'
+    );
     if (flightsWithDistance.length === 0) return 0;
-    
     const sum = flightsWithDistance.reduce((acc, flight) => acc + flight.distance, 0);
     return Math.round(sum / flightsWithDistance.length);
   }, [flights]);
 
   const totalFlightTime = useMemo(() => {
-    // Örnek hesaplama - gerçek verilere göre değiştirilmeli
     let totalMinutes = 0;
     flights.forEach(flight => {
-      // Örnek: Her uçuş ortalama 30 dakika + hız/10 dakika uçuyor varsayımı
-      const flightTimeMinutes = 30 + (flight.groundspeed || 0) / 10;
-      totalMinutes += flightTimeMinutes;
+      if (flight.type === 'hava-savunma') return; // Hava savunmayı atla
+      if (flight.flightDurationMinutes && typeof flight.flightDurationMinutes === 'number') {
+        totalMinutes += flight.flightDurationMinutes;
+      } else {
+        const speed = flight.groundspeed || flight.speed || flight.velocity || 0;
+        const flightTimeMinutes = 30 + speed / 10;
+        totalMinutes += flightTimeMinutes;
+      }
     });
-    
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.round(totalMinutes % 60);
-    
     return { hours, minutes };
   }, [flights]);
 
-  // Detay görünümü için yardımcı veri hazırlığı
-  const getDetailedData = (statType) => {
+  // Hız verisi almak için yardımcı fonksiyon
+  const getFlightSpeed = (flight) => {
+    return flight.groundspeed || flight.speed || flight.velocity || 0;
+  };
+
+  const getDetailedData = (statType, filterKey = null) => {
     switch(statType) {
+      case 'allFlights':
+        // Sadece uçuşları göster, hava savunmayı hariç tut
+        return flights.filter(f => f.type !== 'hava-savunma').map(f => ({ 
+          id: f.id, 
+          callsign: f.callsign, 
+          model: f.model, 
+          type: f.type, 
+          status: f.status, 
+          origin: f.origin_city || f.origin, 
+          destination: f.destination_city || f.destination 
+        }));
       case 'activeFlights':
-        return flights
-          .filter(f => f.status === 'enroute' || f.status === 'active')
-          .map(f => ({
-            id: f.id || f.callsign,
-            callsign: f.callsign,
-            altitude: f.altitude || 'N/A',
-            speed: f.groundspeed || 'N/A',
-            from: f.origin || 'N/A',
-            to: f.destination || 'N/A'
-          }));
-      
+        return flights.filter(f => 
+          (f.status === 'enroute' || f.status === 'active') && 
+          f.type !== 'hava-savunma'
+        ).map(f => ({ 
+          id: f.id, 
+          callsign: f.callsign, 
+          model: f.model, 
+          altitude: f.altitude !== undefined ? f.altitude : 'N/A', 
+          speed: getFlightSpeed(f) !== 0 ? getFlightSpeed(f) : 'N/A',
+          from: f.origin_city || f.origin, 
+          to: f.destination_city || f.destination 
+        }));
       case 'altitude':
-        return flights
-          .filter(f => (f.status === 'enroute' || f.status === 'active') && f.altitude > 0)
-          .sort((a, b) => b.altitude - a.altitude)
-          .map(f => ({
-            id: f.id || f.callsign,
-            callsign: f.callsign,
-            altitude: f.altitude,
-            type: f.type || 'Bilinmiyor'
-          }));
-      
+        return flights.filter(f => 
+          (f.status === 'enroute' || f.status === 'active') && 
+          typeof f.altitude === 'number' && f.altitude > 0 &&
+          f.type !== 'hava-savunma'
+        ).sort((a, b) => b.altitude - a.altitude).map(f => ({ 
+          id: f.id, 
+          callsign: f.callsign, 
+          model: f.model, 
+          altitude: f.altitude, 
+          type: f.type 
+        }));
       case 'speed':
-        return flights
-          .filter(f => (f.status === 'enroute' || f.status === 'active') && f.groundspeed > 0)
-          .sort((a, b) => b.groundspeed - a.groundspeed)
-          .map(f => ({
-            id: f.id || f.callsign,
-            callsign: f.callsign,
-            speed: f.groundspeed,
-            type: f.type || 'Bilinmiyor'
-          }));
-      
+        return flights.filter(f => {
+          const speed = getFlightSpeed(f);
+          return (f.status === 'enroute' || f.status === 'active') && 
+            speed > 0 && 
+            f.type !== 'hava-savunma';
+        }).sort((a, b) => getFlightSpeed(b) - getFlightSpeed(a)).map(f => ({ 
+          id: f.id, 
+          callsign: f.callsign, 
+          model: f.model, 
+          speed: getFlightSpeed(f), 
+          type: f.type 
+        }));
       case 'types':
+        // Tüm tipleri göster, hava savunma dahil
         const typesDetails = {};
-        Object.keys(flightTypeCounts).forEach(type => {
-          typesDetails[type] = flights
-            .filter(f => (f.type || '').toLowerCase() === type)
-            .map(f => ({
-              id: f.id || f.callsign,
-              callsign: f.callsign,
-              status: f.status || 'Bilinmiyor'
-            }));
+        Object.keys(flightTypeCounts).forEach(typeKey => {
+          typesDetails[typeKey] = flights.filter(f => (f.type?.toLowerCase() || 'diger') === typeKey).map(f => ({ 
+            id: f.id, 
+            callsign: f.callsign, 
+            model: f.model, 
+            status: f.status || 'Bilinmiyor', 
+            origin: f.origin_city || f.origin, 
+            destination: f.destination_city || f.destination, 
+            altitude: f.altitude, 
+            speed: getFlightSpeed(f) 
+          }));
         });
         return typesDetails;
-      
       case 'status':
         const statusDetails = {};
-        Object.keys(flightStatusCounts).forEach(status => {
-          statusDetails[status] = flights
-            .filter(f => (f.status || '').toLowerCase() === status)
-            .map(f => ({
-              id: f.id || f.callsign,
-              callsign: f.callsign,
-              type: f.type || 'Bilinmiyor'
-            }));
+        Object.keys(flightStatusCounts).forEach(statusKey => {
+          statusDetails[statusKey] = flights.filter(f => 
+            (f.status?.toLowerCase() || 'diger') === statusKey && 
+            f.type !== 'hava-savunma'
+          ).map(f => ({ 
+            id: f.id, 
+            callsign: f.callsign, 
+            model: f.model, 
+            type: f.type || 'Bilinmiyor', 
+            origin: f.origin_city || f.origin, 
+            destination: f.destination_city || f.destination 
+          }));
         });
         return statusDetails;
-      
       case 'countries':
-        const countriesDetails = {};
-        originCountries.forEach(([country]) => {
-          countriesDetails[country] = flights
-            .filter(f => f.origin_country === country)
-            .map(f => ({
-              id: f.id || f.callsign,
-              callsign: f.callsign,
-              origin: f.origin || 'Bilinmiyor',
-              destination: f.destination || 'Bilinmiyor'
-            }));
+        const countriesData = {};
+        originCountries.forEach(([countryName]) => {
+          countriesData[countryName] = flights.filter(f => 
+            f.origin_country === countryName && 
+            f.type !== 'hava-savunma'
+          ).map(f => ({ 
+            id: f.id, 
+            callsign: f.callsign, 
+            model: f.model, 
+            type: f.type, 
+            origin: f.origin_city || f.origin, 
+            destination: f.destination_city || f.destination, 
+            status: f.status 
+          }));
         });
-        return countriesDetails;
-      
+        return countriesData;
+      case 'countryOrigin':
+        if (!filterKey) return [];
+        return flights.filter(f => 
+          f.origin_country === filterKey && 
+          f.type !== 'hava-savunma'
+        ).map(f => ({ 
+          id: f.id, 
+          callsign: f.callsign, 
+          model: f.model, 
+          type: f.type, 
+          destination_city: f.destination_city || f.destination, 
+          status: f.status,
+          altitude: f.altitude,
+          speed: getFlightSpeed(f)
+        }));
       default:
         return [];
     }
   };
 
-  // Detay Toggle İşleyicisi (Büyük detay panelleri için)
-const toggleDetail = (statName) => {
-  // Büyük detay görünümü açılırken tüm öğe detaylarını kapat
-  if (statName !== expandedStat) {
-    setExpandedItem({ type: null, key: null }); // Herhangi bir öğe detayını kapat
-  }
-  
-  // Mevcut statName açıksa kapat, değilse aç
-  if (expandedStat === statName) {
-    setExpandedStat(null);
-  } else {
-    setExpandedStat(statName);
-  }
-};
+  const toggleDetail = (statName) => {
+    if (statName !== expandedStat) setExpandedItem({ type: null, key: null });
+    setExpandedStat(prev => (prev === statName ? null : statName));
+  };
 
-// Öğe detayları için toggle işleyici
-const toggleItemDetail = (itemType, itemKey, event) => {
-  // Olayın diğer işleyicilere yayılmasını engelle (parent div'e yayılmaması için)
-  if (event) {
-    event.stopPropagation();
-  }
-  
-  // Öğe detayı açılırken tüm büyük detay panellerini kapat
-  if (expandedItem.type !== itemType || expandedItem.key !== itemKey) {
-    setExpandedStat(null); // Herhangi bir büyük detay panelini kapat
-  }
-  
-  // Mevcut öğe detayı açıksa kapat, değilse aç
-  if (expandedItem.type === itemType && expandedItem.key === itemKey) {
-    setExpandedItem({ type: null, key: null });
-  } else {
-    setExpandedItem({ type: itemType, key: itemKey });
-  }
-};
+    const toggleItemDetail = (itemType, itemKey, event) => {
+    if (event) event.stopPropagation();
+    if (expandedItem.type !== itemType || expandedItem.key !== itemKey) setExpandedStat(null);
+    setExpandedItem(prev => (prev.type === itemType && prev.key === itemKey ? { type: null, key: null } : { type: itemType, key: itemKey }));
+  };
 
   if (!flights || flights.length === 0) {
     return (
       <div className="statistics-content-wrapper">
-        <div className="panel-main-title-wrapper">
-          <FaChartPie className="panel-main-icon" />
-          <h3 className="statistics-panel-main-title">Genel İstatistikler</h3>
-        </div>
-        <div className="stats-empty-container">
-          <FaExclamationTriangle className="empty-icon" />
-          <p className="no-data-message">Gösterilecek uçuş verisi bulunmamaktadır.</p>
-          <p className="no-data-hint">Uçuş verilerini yüklemek için filtre ayarlarını kontrol edin.</p>
-        </div>
+        <div className="panel-main-title-wrapper"><FaChartPie className="panel-main-icon" /><h3 className="statistics-panel-main-title">Genel İstatistikler</h3></div>
+        <div className="stats-empty-container"><FaExclamationTriangle className="empty-icon" /><p className="no-data-message">Gösterilecek uçuş verisi bulunmamaktadır.</p><p className="no-data-hint">Uçuş verilerini yüklemek için filtre ayarlarını kontrol edin.</p></div>
       </div>
     );
   }
 
-  // Uçak tipleri için ikon eşleştirmesi
-  const typeIcons = {
-    sivil: <FaPlane className="type-icon civil" />,
-    askeri: <FaShieldAlt className="type-icon military" />,
-    muttefik: <FaUserFriends className="type-icon ally" />,
+  const typeIcons = { 
+    sivil: <FaPlane className="type-icon civil" />, 
+    askeri: <FaShieldAlt className="type-icon military" />, 
+    vip: <FaStar className="type-icon vip" />, 
+    muttefik: <FaUserFriends className="type-icon ally" />, 
     'hava-savunma': <FaSatelliteDish className="type-icon defense" />,
-    vip: <FaStar className="type-icon vip" />,
-    diger: <FaLayerGroup className="type-icon other" />
+    diger: <FaLayerGroup className="type-icon other" /> 
+  };
+  
+  const statusIcons = { 
+    active: <FaPlaneDeparture className="status-icon active" />, 
+    enroute: <FaPlaneDeparture className="status-icon enroute" />, 
+    landed: <FaPlaneArrival className="status-icon landed" />, 
+    scheduled: <FaClock className="status-icon scheduled" />, 
+    delayed: <FaExclamationTriangle className="status-icon delayed" />, 
+    diverted: <FaRoute className="status-icon diverted" />, 
+    unknown: <FaInfoCircle className="status-icon unknown" />, 
+    other: <FaInfoCircle className="status-icon other" />, 
+    diger: <FaInfoCircle className="status-icon diger" />
   };
 
-  // Durum ikonları
-  const statusIcons = {
-    active: <FaPlaneDeparture className="status-icon active" />,
-    landed: <FaPlaneArrival className="status-icon landed" />,
-    scheduled: <FaClock className="status-icon scheduled" />,
-    delayed: <FaExclamationTriangle className="status-icon delayed" />,
-    other: <FaInfoCircle className="status-icon other" />
-  };
+  const renderItemDetailView = () => {
+    const { type, key } = expandedItem;
+    if (!type || !key) return null;
 
-  // Detay görünümü render fonksiyonu
-  // src/components/flightcontrol/StatisticsPanel.js
+    let itemsToShow = [];
+    let title = "";
+    let icon = null;
+    let headers = [];
+    let rowRenderer = (flight) => <></>;
 
+    if (type === 'flightType') {
+      itemsToShow = getDetailedData('types')[key] || [];
+      title = `${key.charAt(0).toUpperCase() + key.slice(1)} ${key === 'hava-savunma' ? 'Sistemleri' : 'Uçakları'}`;
+      icon = typeIcons[key] || typeIcons.diger;
+      
+      // Hava savunma için özel header ve renderer
+      if (key === 'hava-savunma') {
+        headers = ["Çağrı Kodu", "Model", "Durum", "Konum"];
+        rowRenderer = (f) => (
+          <>
+            <td>{f.callsign}</td>
+            <td>{f.model}</td>
+            <td>{f.status}</td>
+            <td>{f.origin || 'N/A'}</td>
+          </>
+        );
+      } else {
+        headers = ["Çağrı Kodu", "Model", "Durum", "İrtifa (ft)", "Hız (kts)"];
+        rowRenderer = (f) => (
+          <>
+            <td>{f.callsign}</td>
+            <td>{f.model}</td>
+            <td>{f.status}</td>
+            <td>{f.altitude !== undefined ? f.altitude : 'N/A'}</td>
+            <td>{f.speed > 0 ? f.speed : 'N/A'}</td>
+          </>
+        );
+      }
+    } else if (type === 'flightStatus') {
+      itemsToShow = getDetailedData('status')[key] || [];
+      title = `${key.charAt(0).toUpperCase() + key.slice(1)} Durumundaki Uçuşlar`;
+      icon = statusIcons[key] || statusIcons.other;
+      headers = ["Çağrı Kodu", "Model", "Tip", "Kalkış", "Varış"];
+      rowRenderer = (f) => (
+        <>
+          <td>{f.callsign}</td>
+          <td>{f.model}</td>
+          <td>{f.type}</td>
+          <td>{f.origin}</td>
+          <td>{f.destination}</td>
+        </>
+      );
+    } else if (type === 'countryOrigin') {
+      itemsToShow = getDetailedData('countryOrigin', key);
+      title = `${key} Kalkışlı Uçuşlar`;
+      icon = <FaFlag className="country-icon" />;
+      headers = ["Çağrı Kodu", "Model", "Tip", "Varış Şehri", "Durum", "İrtifa (ft)", "Hız (kts)"];
+      rowRenderer = (f) => (
+        <>
+          <td>{f.callsign}</td>
+          <td>{f.model}</td>
+          <td>{f.type}</td>
+          <td>{f.destination_city}</td>
+          <td>{f.status}</td>
+          <td>{f.altitude !== undefined ? f.altitude : 'N/A'}</td>
+          <td>{f.speed > 0 ? f.speed : 'N/A'}</td>
+        </>
+      );
+    }
 
-
-
-const renderItemDetailView = () => {
-  const { type, key } = expandedItem;
-  
-  if (!type || !key) return null;
-  
-  if (type === 'flightType') {
-    // Uçak tipine göre detay görünümü
-    const typeFlights = flights.filter(f => (f.type || '').toLowerCase() === key);
-    
     return (
       <div className="item-detail-view">
         <div className="item-detail-header">
-          {typeIcons[key] || typeIcons.diger}
-          <span>{key.charAt(0).toUpperCase() + key.slice(1)} Uçakları</span>
+          {icon} <span>{title} ({itemsToShow.length})</span>
           <div className="item-detail-close" onClick={() => setExpandedItem({ type: null, key: null })}>
             <FaAngleUp />
           </div>
         </div>
         <div className="item-detail-content">
-          {typeFlights.length > 0 ? (
+          {itemsToShow.length > 0 ? (
             <div className="item-detail-table-container">
               <table className="detail-table compact">
                 <thead>
-                  <tr>
-                    <th>Çağrı Kodu</th>
-                    <th>Durum</th>
-                    <th>İrtifa</th>
-                    <th>Hız</th>
-                  </tr>
+                  <tr>{headers.map(h => <th key={h}>{h}</th>)}</tr>
                 </thead>
                 <tbody>
-                  {typeFlights.map(flight => (
-                    <tr key={flight.id || flight.callsign}>
-                      <td>{flight.callsign}</td>
-                      <td>{flight.status || 'Bilinmiyor'}</td>
-                      <td>{flight.altitude || 'N/A'}</td>
-                      <td>{flight.groundspeed || 'N/A'}</td>
+                  {itemsToShow.map(flight => (
+                    <tr 
+                      key={flight.id} 
+                      onClick={() => onFlightClick && onFlightClick(flight)} 
+                      style={{ cursor: onFlightClick ? 'pointer' : 'default' }}
+                    >
+                      {rowRenderer(flight)}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="no-detail-data">Bu tipte uçuş bulunmamaktadır.</p>
+            <p className="no-detail-data">Bu kategoride uçuş bulunmamaktadır.</p>
           )}
         </div>
       </div>
     );
-  } 
-  else if (type === 'flightStatus') {
-    // Uçuş durumuna göre detay görünümü
-    const statusFlights = flights.filter(f => (f.status || '').toLowerCase() === key);
-    
-    return (
-      <div className="item-detail-view">
-        <div className="item-detail-header">
-          {statusIcons[key] || statusIcons.other}
-          <span>{key.charAt(0).toUpperCase() + key.slice(1)} Durumundaki Uçuşlar</span>
-          <div className="item-detail-close" onClick={() => setExpandedItem({ type: null, key: null })}>
-            <FaAngleUp />
-          </div>
-        </div>
-        <div className="item-detail-content">
-          {statusFlights.length > 0 ? (
-            <div className="item-detail-table-container">
-              <table className="detail-table compact">
-                <thead>
-                  <tr>
-                    <th>Çağrı Kodu</th>
-                    <th>Tip</th>
-                    <th>Kalkış</th>
-                    <th>Varış</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {statusFlights.map(flight => (
-                    <tr key={flight.id || flight.callsign}>
-                      <td>{flight.callsign}</td>
-                      <td>{flight.type || 'Bilinmiyor'}</td>
-                      <td>{flight.origin || 'N/A'}</td>
-                      <td>{flight.destination || 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="no-detail-data">Bu durumda uçuş bulunmamaktadır.</p>
-          )}
-        </div>
-      </div>
-    );
-  }
-  
-  return null;
-};
-// Detay görünümü render fonksiyonu değişiyor - kapatma düğmesi eklendi
-const renderDetailView = (statType) => {
-  if (!statType) return null;
+  };
 
-  const detailedData = getDetailedData(statType);
-  
-  // Detay başlığını ve içeriğini hazırlayan yardımcı fonksiyon
-  const getDetailContent = () => {
-    switch(statType) {
-      case 'activeFlights':
-        return (
+  const renderDetailView = (statType) => {
+    if (!statType) return null;
+    const detailedDataResult = getDetailedData(statType);
+
+    let titlePrefix = "";
+    let icon = <FaInfoCircle />;
+    let tableHeaders = [];
+    let rowRenderer = (flight) => <></>;
+    let dataToRenderAsList = null;
+
+    if (statType === 'allFlights') {
+        titlePrefix = "Tüm Uçuşlar"; icon = <FaLayerGroup />;
+        tableHeaders = ["Çağrı Kodu", "Model", "Tip", "Durum", "Kalkış", "Varış"];
+        rowRenderer = (f) => (
           <>
-            <h5 className="detail-title">
-              <FaPlaneDeparture /> Aktif Uçuşlar Detayı
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
-            </h5>
-            <div className="detail-table-container">
-              <table className="detail-table">
-                <thead>
-                  <tr>
-                    <th>Çağrı Kodu</th>
-                    <th>İrtifa (ft)</th>
-                    <th>Hız (kts)</th>
-                    <th>Kalkış</th>
-                    <th>Varış</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detailedData.map(flight => (
-                    <tr key={flight.id}>
-                      <td>{flight.callsign}</td>
-                      <td>{flight.altitude}</td>
-                      <td>{flight.speed}</td>
-                      <td>{flight.from}</td>
-                      <td>{flight.to}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <td>{f.callsign}</td>
+            <td>{f.model}</td>
+            <td>{f.type}</td>
+            <td>{f.status}</td>
+            <td>{f.origin}</td>
+            <td>{f.destination}</td>
           </>
         );
-      
-      case 'altitude':
-        return (
+        dataToRenderAsList = detailedDataResult;
+    } else if (statType === 'activeFlights') {
+        titlePrefix = "Aktif Uçuşlar"; icon = <FaPlaneDeparture />;
+        tableHeaders = ["Çağrı Kodu", "Model", "İrtifa (ft)", "Hız (kts)", "Kalkış", "Varış"];
+        rowRenderer = (f) => (
           <>
-            <h5 className="detail-title">
-              <FaArrowsAltV /> İrtifa Dağılımı Detayı
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
-            </h5>
-            <div className="detail-table-container">
-              <table className="detail-table">
-                <thead>
-                  <tr>
-                    <th>Çağrı Kodu</th>
-                    <th>İrtifa (ft)</th>
-                    <th>Tip</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detailedData.map(flight => (
-                    <tr key={flight.id}>
-                      <td>{flight.callsign}</td>
-                      <td>{flight.altitude}</td>
-                      <td>{flight.type}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <td>{f.callsign}</td>
+            <td>{f.model}</td>
+            <td>{f.altitude}</td>
+            <td>{f.speed}</td>
+            <td>{f.from}</td>
+            <td>{f.to}</td>
           </>
         );
-      
-      case 'speed':
-        return (
+        dataToRenderAsList = detailedDataResult;
+    } else if (statType === 'altitude') {
+        titlePrefix = "İrtifa Dağılımı"; icon = <FaArrowsAltV />;
+        tableHeaders = ["Çağrı Kodu", "Model", "Tip", "İrtifa (ft)"];
+        rowRenderer = (f) => (
           <>
-            <h5 className="detail-title">
-              <FaTachometerAlt /> Hız Dağılımı Detayı
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
-            </h5>
-            <div className="detail-table-container">
-              <table className="detail-table">
-                <thead>
-                  <tr>
-                    <th>Çağrı Kodu</th>
-                    <th>Hız (kts)</th>
-                    <th>Tip</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detailedData.map(flight => (
-                    <tr key={flight.id}>
-                      <td>{flight.callsign}</td>
-                      <td>{flight.speed}</td>
-                      <td>{flight.type}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <td>{f.callsign}</td>
+            <td>{f.model}</td>
+            <td>{f.type}</td>
+            <td>{f.altitude}</td>
           </>
         );
-      
-      case 'types':
+        dataToRenderAsList = detailedDataResult;
+    } else if (statType === 'speed') {
+        titlePrefix = "Hız Dağılımı"; icon = <FaTachometerAlt />;
+        tableHeaders = ["Çağrı Kodu", "Model", "Tip", "Hız (kts)"];
+        rowRenderer = (f) => (
+          <>
+            <td>{f.callsign}</td>
+            <td>{f.model}</td>
+            <td>{f.type}</td>
+            <td>{f.speed}</td>
+          </>
+        );
+        dataToRenderAsList = detailedDataResult;
+    }
+    else if (statType === 'types') {
         return (
           <>
             <h5 className="detail-title">
               <FaLayerGroup /> Uçak Tipleri Detayı
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
+              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}><FaAngleUp /></div>
             </h5>
             <div className="detail-tabs">
-              {Object.keys(detailedData).map(type => (
-                <div key={type} className="detail-tab">
-                  <div className="detail-tab-header">
-                    {typeIcons[type] || typeIcons.diger}
-                    <span>{type.charAt(0).toUpperCase() + type.slice(1)} ({detailedData[type].length})</span>
-                  </div>
-                  <div className="detail-tab-content">
-                    {detailedData[type].length > 0 ? (
-                      <table className="detail-table compact">
-                        <thead>
-                          <tr>
-                            <th>Çağrı Kodu</th>
-                            <th>Durum</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {detailedData[type].map(flight => (
-                            <tr key={flight.id}>
-                              <td>{flight.callsign}</td>
-                              <td>{flight.status}</td>
+              {Object.entries(detailedDataResult).map(([type, flightsInType]) => {
+                  if (flightsInType.length === 0) return null;
+                  
+                  // Hava savunma için özel görünüm
+                  if (type === 'hava-savunma') {
+                    return (
+                      <div key={type} className="detail-tab">
+                        <div className="detail-tab-header">
+                          {typeIcons[type] || typeIcons.diger}
+                          <span>Hava Savunma Sistemleri ({flightsInType.length})</span>
+                        </div>
+                        <div className="detail-tab-content">
+                          <table className="detail-table compact">
+                            <thead>
+                              <tr>
+                                <th>Çağrı Kodu</th>
+                                <th>Model</th>
+                                <th>Durum</th>
+                                <th>Konum</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {flightsInType.map(flight => (
+                                <tr 
+                                  key={flight.id} 
+                                  onClick={() => onFlightClick && onFlightClick(flight)} 
+                                  style={{ cursor: onFlightClick ? 'pointer' : 'default' }}
+                                >
+                                  <td>{flight.callsign}</td>
+                                  <td>{flight.model}</td>
+                                  <td>{flight.status}</td>
+                                  <td>{flight.origin || 'N/A'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div key={type} className="detail-tab">
+                      <div className="detail-tab-header">
+                        {typeIcons[type] || typeIcons.diger}
+                        <span>{type.charAt(0).toUpperCase() + type.slice(1)} ({flightsInType.length})</span>
+                      </div>
+                      <div className="detail-tab-content">
+                        <table className="detail-table compact">
+                          <thead>
+                            <tr>
+                              <th>Çağrı Kodu</th>
+                              <th>Model</th>
+                              <th>Durum</th>
+                              <th>Kalkış</th>
+                              <th>Varış</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p className="no-detail-data">Bu tipte uçuş bulunmamaktadır.</p>
-                    )}
-                  </div>
-                </div>
-              ))}
+                          </thead>
+                          <tbody>
+                            {flightsInType.map(flight => (
+                              <tr 
+                                key={flight.id} 
+                                onClick={() => onFlightClick && onFlightClick(flight)} 
+                                style={{ cursor: onFlightClick ? 'pointer' : 'default' }}
+                              >
+                                <td>{flight.callsign}</td>
+                                <td>{flight.model}</td>
+                                <td>{flight.status}</td>
+                                <td>{flight.origin}</td>
+                                <td>{flight.destination}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+              })}
             </div>
           </>
         );
-        
-      case 'status':
+    } else if (statType === 'status') {
         return (
           <>
             <h5 className="detail-title">
               <FaInfoCircle /> Uçuş Durumları Detayı
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
+              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}><FaAngleUp /></div>
             </h5>
             <div className="detail-tabs">
-              {Object.keys(detailedData).map(status => (
-                <div key={status} className="detail-tab">
-                  <div className="detail-tab-header">
-                    {statusIcons[status] || statusIcons.other}
-                    <span>{status.charAt(0).toUpperCase() + status.slice(1)} ({detailedData[status].length})</span>
-                  </div>
-                  <div className="detail-tab-content">
-                    {detailedData[status].length > 0 ? (
-                      <table className="detail-table compact">
-                        <thead>
-                          <tr>
-                            <th>Çağrı Kodu</th>
-                            <th>Tip</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {detailedData[status].map(flight => (
-                            <tr key={flight.id}>
-                              <td>{flight.callsign}</td>
-                              <td>{flight.type}</td>
+              {Object.entries(detailedDataResult).map(([status, flightsInStatus]) => {
+                  if (flightsInStatus.length === 0) return null;
+                  return (
+                    <div key={status} className="detail-tab">
+                      <div className="detail-tab-header">
+                        {statusIcons[status] || statusIcons.other}
+                        <span>{status.charAt(0).toUpperCase() + status.slice(1)} ({flightsInStatus.length})</span>
+                      </div>
+                      <div className="detail-tab-content">
+                        <table className="detail-table compact">
+                          <thead>
+                            <tr>
+                              <th>Çağrı Kodu</th>
+                              <th>Model</th>
+                              <th>Tip</th>
+                              <th>Kalkış</th>
+                              <th>Varış</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p className="no-detail-data">Bu durumda uçuş bulunmamaktadır.</p>
-                    )}
-                  </div>
-                </div>
-              ))}
+                          </thead>
+                          <tbody>
+                            {flightsInStatus.map(flight => (
+                              <tr 
+                                key={flight.id} 
+                                onClick={() => onFlightClick && onFlightClick(flight)} 
+                                style={{ cursor: onFlightClick ? 'pointer' : 'default' }}
+                              >
+                                <td>{flight.callsign}</td>
+                                <td>{flight.model}</td>
+                                <td>{flight.type}</td>
+                                                                <td>{flight.origin}</td>
+                                <td>{flight.destination}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+              })}
             </div>
           </>
         );
-        
-      case 'countries':
+    } else if (statType === 'countries') {
         return (
           <>
             <h5 className="detail-title">
-              <FaGlobeAmericas /> Ülke Bazlı Uçuşlar
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
+              <FaGlobeAmericas /> Ülke Bazlı Uçuşlar Detayı
+              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}><FaAngleUp /></div>
             </h5>
             <div className="detail-tabs">
-              {Object.keys(detailedData).map(country => (
-                <div key={country} className="detail-tab">
-                  <div className="detail-tab-header">
-                    <FaFlag className="country-icon" />
-                    <span>{country} ({detailedData[country].length})</span>
-                  </div>
-                  <div className="detail-tab-content">
-                    <table className="detail-table compact">
-                      <thead>
-                        <tr>
-                          <th>Çağrı Kodu</th>
-                          <th>Kalkış</th>
-                          <th>Varış</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {detailedData[country].map(flight => (
-                          <tr key={flight.id}>
-                            <td>{flight.callsign}</td>
-                            <td>{flight.origin}</td>
-                            <td>{flight.destination}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ))}
+              {Object.entries(detailedDataResult).map(([country, flightsInCountry]) => {
+                if (flightsInCountry.length === 0) return null;
+                return (
+                    <div key={country} className="detail-tab">
+                      <div className="detail-tab-header">
+                        <FaFlag className="country-icon" />
+                        <span>{country} ({flightsInCountry.length})</span>
+                      </div>
+                      <div className="detail-tab-content">
+                        <table className="detail-table compact">
+                          <thead>
+                            <tr>
+                              <th>Çağrı Kodu</th>
+                              <th>Model</th>
+                              <th>Tip</th>
+                              <th>Varış</th>
+                              <th>Durum</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {flightsInCountry.map(flight => (
+                              <tr 
+                                key={flight.id} 
+                                onClick={() => onFlightClick && onFlightClick(flight)} 
+                                style={{ cursor: onFlightClick ? 'pointer' : 'default' }}
+                              >
+                                <td>{flight.callsign}</td>
+                                <td>{flight.model}</td>
+                                <td>{flight.type}</td>
+                                <td>{flight.destination}</td>
+                                <td>{flight.status}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                );
+              })}
             </div>
           </>
         );
-      
-      default:
+    } else if (!dataToRenderAsList) {
         return (
-          <>
-            <h5 className="detail-title">
-              <FaInfoCircle /> Detay
-              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}>
-                <FaAngleUp />
-              </div>
-            </h5>
-            <p>Bu istatistik için detaylı veri bulunmamaktadır.</p>
-          </>
+            <div className="detail-view">
+                <h5 className="detail-title">
+                    <FaInfoCircle /> Detay
+                    <div className="detail-close-btn" onClick={() => setExpandedStat(null)}><FaAngleUp /></div>
+                </h5>
+                <p>Bu istatistik için detaylı veri bulunmamaktadır.</p>
+            </div>
         );
     }
+
+    if (!dataToRenderAsList || dataToRenderAsList.length === 0) {
+        return (
+            <div className="detail-view">
+                <h5 className="detail-title">
+                  {icon} {titlePrefix} Detayı
+                  <div className="detail-close-btn" onClick={() => setExpandedStat(null)}><FaAngleUp /></div>
+                </h5>
+                <p>Bu istatistik için detaylı veri bulunmamaktadır.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="detail-view">
+            <h5 className="detail-title">
+              {icon} {titlePrefix} Detayı ({dataToRenderAsList.length})
+              <div className="detail-close-btn" onClick={() => setExpandedStat(null)}><FaAngleUp /></div>
+            </h5>
+            <div className="detail-table-container">
+                <table className="detail-table">
+                    <thead>
+                      <tr>{tableHeaders.map(h => <th key={h}>{h}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {dataToRenderAsList.map(flight => (
+                        <tr 
+                          key={flight.id} 
+                          onClick={() => onFlightClick && onFlightClick(flight)} 
+                          style={{ cursor: onFlightClick ? 'pointer' : 'default' }}
+                        >
+                          {rowRenderer(flight)}
+                        </tr>
+                      ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
   };
-  
+
   return (
-    <div className="detail-view">
-      {getDetailContent()}
-    </div>
-  );
-};
-
-return (
-  <div className="statistics-content-wrapper">
-    <div className="panel-main-title-wrapper">
-      <FaChartPie className="panel-main-icon" />
-      <h3 className="statistics-panel-main-title">Genel İstatistikler</h3>
-    </div>
-
-    <div className="stats-dashboard">
-      <div className="stats-group primary-stats">
-        <div 
-          className={`statistic-card ${expandedStat === 'activeFlights' ? 'expanded' : ''}`}
-          onClick={() => toggleDetail('activeFlights')}
-        >
-          <div className="stat-card-icon">
-            <FaPlaneDeparture />
-          </div>
-          <div className="stat-card-content">
-            <span className="stat-value highlight">{activeFlights}</span>
-            <span className="stat-label">Aktif Uçuşlar</span>
-            <div className="stat-detail-toggle">
-              {expandedStat === 'activeFlights' ? <FaAngleUp /> : <FaAngleDown />}
+    <div className="statistics-content-wrapper">
+      <div className="panel-main-title-wrapper">
+        <FaChartPie className="panel-main-icon" />
+        <h3 className="statistics-panel-main-title">Genel İstatistikler</h3>
+      </div>
+      <div className="stats-dashboard">
+        <div className="stats-group primary-stats">
+          <div className={`statistic-card ${expandedStat === 'activeFlights' ? 'expanded' : ''}`} onClick={() => toggleDetail('activeFlights')}>
+            <div className="stat-card-icon"><FaPlaneDeparture /></div>
+            <div className="stat-card-content">
+              <span className="stat-value highlight">{activeFlights}</span>
+              <span className="stat-label">Aktif Uçuşlar</span>
+              <div className="stat-detail-toggle">
+                {expandedStat === 'activeFlights' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
             </div>
           </div>
+          {expandedStat === 'activeFlights' && renderDetailView('activeFlights')}
+
+          <div className={`statistic-card ${expandedStat === 'allFlights' ? 'expanded' : ''}`} onClick={() => toggleDetail('allFlights')}>
+            <div className="stat-card-icon"><FaLayerGroup /></div>
+            <div className="stat-card-content">
+              <span className="stat-value">{totalFlights}</span>
+              <span className="stat-label">Toplam Uçuşlar</span>
+              <div className="stat-detail-toggle">
+                {expandedStat === 'allFlights' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
+            </div>
+          </div>
+          {expandedStat === 'allFlights' && renderDetailView('allFlights')}
+
+          <div className={`statistic-card ${expandedStat === 'altitude' ? 'expanded' : ''}`} onClick={() => toggleDetail('altitude')}>
+            <div className="stat-card-icon"><FaArrowsAltV /></div>
+            <div className="stat-card-content">
+              <span className="stat-value">{averageAltitude.toLocaleString()}</span>
+              <span className="stat-label">Ort. İrtifa (ft)</span>
+              <div className="stat-detail-toggle">
+                {expandedStat === 'altitude' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
+            </div>
+          </div>
+          {expandedStat === 'altitude' && renderDetailView('altitude')}
+
+          <div className={`statistic-card ${expandedStat === 'speed' ? 'expanded' : ''}`} onClick={() => toggleDetail('speed')}>
+            <div className="stat-card-icon"><FaTachometerAlt /></div>
+            <div className="stat-card-content">
+              <span className="stat-value">{averageSpeed}</span>
+              <span className="stat-label">Ort. Hız (kts)</span>
+              <div className="stat-detail-toggle">
+                {expandedStat === 'speed' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
+            </div>
+          </div>
+          {expandedStat === 'speed' && renderDetailView('speed')}
         </div>
-        {expandedStat === 'activeFlights' && renderDetailView('activeFlights')}
 
-        <div 
-          className={`statistic-card ${expandedStat === 'totalFlights' ? 'expanded' : ''}`}
-          onClick={() => toggleDetail('totalFlights')}
-        >
-          <div className="stat-card-icon">
-            <FaLayerGroup />
-          </div>
-          <div className="stat-card-content">
-            <span className="stat-value">{totalFlights}</span>
-            <span className="stat-label">Toplam Uçuşlar</span>
-            <div className="stat-detail-toggle">
-              {expandedStat === 'totalFlights' ? <FaAngleUp /> : <FaAngleDown />}
+        <div className="stats-row">
+          <div className="stats-group secondary-stats">
+            <h4 className="stats-group-title">
+              <FaInfoCircle className="group-title-icon" />
+              Uçuş Durumları
+              <div className="stats-toggle-btn" onClick={() => toggleDetail('status')}>
+                {expandedStat === 'status' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
+            </h4>
+            <div className="status-grid">
+              {Object.entries(flightStatusCounts).filter(([, count]) => count > 0).map(([statusKey, count]) => (
+                <div 
+                  key={statusKey} 
+                  className={`status-item ${expandedItem.type === 'flightStatus' && expandedItem.key === statusKey ? 'item-expanded' : ''}`} 
+                  onClick={(e) => toggleItemDetail('flightStatus', statusKey, e)}
+                >
+                  {statusIcons[statusKey] || statusIcons.other}
+                  <div className="status-details">
+                    <span className="status-label">{statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}</span>
+                    <span className="status-count">{count}</span>
+                  </div>
+                  <div className="item-detail-toggle-small">
+                    {expandedItem.type === 'flightStatus' && expandedItem.key === statusKey ? <FaAngleUp /> : <FaAngleDown />}
+                  </div>
+                </div>
+              ))}
             </div>
+            {expandedItem.type === 'flightStatus' && expandedItem.key && (
+              <div className="status-item-detail-container">
+                {renderItemDetailView()}
+              </div>
+            )}
+            {expandedStat === 'status' && renderDetailView('status')}
           </div>
-        </div>
-        {expandedStat === 'totalFlights' && renderDetailView('totalFlights')}
 
-        <div 
-          className={`statistic-card ${expandedStat === 'altitude' ? 'expanded' : ''}`}
-          onClick={() => toggleDetail('altitude')}
-        >
-          <div className="stat-card-icon">
-            <FaArrowsAltV />
-          </div>
-          <div className="stat-card-content">
-            <span className="stat-value">{averageAltitude.toLocaleString()}</span>
-            <span className="stat-label">Ort. İrtifa (ft)</span>
-            <div className="stat-detail-toggle">
-              {expandedStat === 'altitude' ? <FaAngleUp /> : <FaAngleDown />}
-            </div>
-          </div>
-        </div>
-        {expandedStat === 'altitude' && renderDetailView('altitude')}
-
-        <div 
-          className={`statistic-card ${expandedStat === 'speed' ? 'expanded' : ''}`}
-          onClick={() => toggleDetail('speed')}
-        >
-          <div className="stat-card-icon">
-            <FaTachometerAlt />
-          </div>
-          <div className="stat-card-content">
-            <span className="stat-value">{averageSpeed}</span>
-            <span className="stat-label">Ort. Hız (kts)</span>
-            <div className="stat-detail-toggle">
-              {expandedStat === 'speed' ? <FaAngleUp /> : <FaAngleDown />}
-            </div>
-          </div>
-        </div>
-        {expandedStat === 'speed' && renderDetailView('speed')}
-      </div>
-
-      <div className="stats-row">
-      <div className="stats-group secondary-stats">
-  <h4 className="stats-group-title">
-    <FaInfoCircle className="group-title-icon" />
-    Uçuş Durumları
-    <div 
-      className="stats-toggle-btn"
-      onClick={() => toggleDetail('status')}
-    >
-      {expandedStat === 'status' ? <FaAngleUp /> : <FaAngleDown />}
-    </div>
-  </h4>
-  
-  <div className="status-grid">
-    {Object.entries(flightStatusCounts).map(([status, count]) => (
-      <div 
-      key={status} 
-      className={`status-item ${expandedItem.type === 'flightStatus' && expandedItem.key === status ? 'item-expanded' : ''}`}
-      onClick={(e) => toggleItemDetail('flightStatus', status, e)}
-    >
-      {statusIcons[status] || statusIcons.other}
-      <div className="status-details">
-        <span className="status-label">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
-        <span className="status-count">{count}</span>
-      </div>
-      <div className="item-detail-toggle-small">
-        {expandedItem.type === 'flightStatus' && expandedItem.key === status ? <FaAngleUp /> : <FaAngleDown />}
-      </div>
-    </div>
-    ))}
-  </div>
-  {Object.entries(flightStatusCounts).map(([status]) => (
-    expandedItem.type === 'flightStatus' && expandedItem.key === status && 
-    <div key={`detail-${status}`} className="status-item-detail-container">
-      {renderItemDetailView()}
-    </div>
-  ))}
-  {expandedStat === 'status' && renderDetailView('status')}
-</div>
-
-      <div className="stats-group secondary-stats">
-        <h4 className="stats-group-title">
-          <FaLayerGroup className="group-title-icon" />
-          Uçak Tiplerine Göre
-          <div 
-            className="stats-toggle-btn"
-            onClick={() => toggleDetail('types')}
-          >
-            {expandedStat === 'types' ? <FaAngleUp /> : <FaAngleDown />}
-          </div>
-        </h4>
-        
-        {Object.entries(flightTypeCounts).map(([type, count]) => (
-          <div key={type}>
-            <div 
-  className={`statistic-item modern type-item ${expandedItem.type === 'flightType' && expandedItem.key === type ? 'item-expanded' : ''}`}
-  onClick={(e) => toggleItemDetail('flightType', type, e)}
->
-  <div className="statistic-label-icon">
-    {typeIcons[type] || typeIcons.diger}
-    <span style={{ textTransform: 'capitalize' }}>{type}:</span>
-  </div>
-  <span className="statistic-value">{count}</span>
-  <div className="item-detail-toggle">
-    {expandedItem.type === 'flightType' && expandedItem.key === type ? <FaAngleUp /> : <FaAngleDown />}
-  </div>
-</div>
-            {expandedItem.type === 'flightType' && expandedItem.key === type && renderItemDetailView()}
-          </div>
-        ))}
-        {expandedStat === 'types' && renderDetailView('types')}
-      </div>
-      </div>
-
-      <div className="stats-row">
-        <div className="stats-group secondary-stats">
-          <h4 className="stats-group-title">
-            <FaGlobeAmericas className="group-title-icon" />
-            En Çok Uçuş Olan Ülkeler
-            <div 
-              className="stats-toggle-btn"
-              onClick={() => toggleDetail('countries')}
-            >
-              {expandedStat === 'countries' ? <FaAngleUp /> : <FaAngleDown />}
-            </div>
-          </h4>
-          
-          <div className="countries-list">
-            {originCountries.map(([country, count], index) => (
-              <div className="country-item" key={country}>
-                <span className="country-rank">{index + 1}</span>
-                <FaFlag className="country-flag" />
-                <span className="country-name">{country}</span>
-                <span className="country-count">{count}</span>
+          <div className="stats-group secondary-stats">
+            <h4 className="stats-group-title">
+              <FaLayerGroup className="group-title-icon" />
+              Uçak Tiplerine Göre
+              <div className="stats-toggle-btn" onClick={() => toggleDetail('types')}>
+                {expandedStat === 'types' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
+            </h4>
+            {Object.entries(flightTypeCounts).filter(([, count]) => count > 0).map(([typeKey, count]) => (
+              <div key={typeKey}>
+                <div 
+                  className={`statistic-item modern type-item ${expandedItem.type === 'flightType' && expandedItem.key === typeKey ? 'item-expanded' : ''}`} 
+                  onClick={(e) => toggleItemDetail('flightType', typeKey, e)}
+                >
+                  <div className="statistic-label-icon">
+                    {typeIcons[typeKey] || typeIcons.diger}
+                    <span style={{ textTransform: 'capitalize' }}>
+                      {typeKey === 'hava-savunma' ? 'Hava Savunma' : typeKey}:
+                    </span>
+                  </div>
+                  <span className="statistic-value">{count}</span>
+                  <div className="item-detail-toggle">
+                    {expandedItem.type === 'flightType' && expandedItem.key === typeKey ? <FaAngleUp /> : <FaAngleDown />}
+                  </div>
+                </div>
+                {expandedItem.type === 'flightType' && expandedItem.key === typeKey && renderItemDetailView()}
               </div>
             ))}
+            {expandedStat === 'types' && renderDetailView('types')}
           </div>
-          {expandedStat === 'countries' && renderDetailView('countries')}
         </div>
 
-        <div className="stats-group secondary-stats">
-          <h4 className="stats-group-title">
-            <FaRoute className="group-title-icon" />
-            Ek Uçuş Metrikleri
-          </h4>
-          
-          <div className="metric-item">
-            <div className="metric-icon">
-              <FaMapMarkedAlt />
+        <div className="stats-row">
+          <div className="stats-group secondary-stats">
+            <h4 className="stats-group-title">
+              <FaGlobeAmericas className="group-title-icon" />
+              En Çok Uçuş Olan Ülkeler
+              <div className="stats-toggle-btn" onClick={() => toggleDetail('countries')}>
+                {expandedStat === 'countries' ? <FaAngleUp /> : <FaAngleDown />}
+              </div>
+            </h4>
+            <div className="countries-list">
+              {originCountries.map(([country, count], index) => (
+                <div key={country}>
+                  <div
+                    className={`country-item ${expandedItem.type === 'countryOrigin' && expandedItem.key === country ? 'item-expanded' : ''}`}
+                    onClick={(e) => toggleItemDetail('countryOrigin', country, e)}
+                    style={{cursor: 'pointer'}}
+                  >
+                    <span className="country-rank">{index + 1}</span>
+                    <FaFlag className="country-flag" />
+                    <span className="country-name">{country}</span>
+                    <span className="country-count">{count}</span>
+                    <div className="item-detail-toggle" style={{marginLeft: 'auto', opacity: (expandedItem.type === 'countryOrigin' && expandedItem.key === country) ? 1: 0.7}}>
+                      {expandedItem.type === 'countryOrigin' && expandedItem.key === country ? <FaAngleUp /> : <FaAngleDown />}
+                    </div>
+                  </div>
+                  {/* Ülke detayı hemen altında render edilecek */}
+                  {expandedItem.type === 'countryOrigin' && expandedItem.key === country && (
+                    <div className="country-item-detail-container">
+                      {renderItemDetailView()}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-            <div className="metric-details">
-              <span className="metric-label">Ortalama Mesafe:</span>
-              <span className="metric-value">{averageDistance.toLocaleString()} km</span>
-            </div>
+            {expandedStat === 'countries' && renderDetailView('countries')}
           </div>
-          
-          <div className="metric-item">
-            <div className="metric-icon">
-              <FaClock />
+
+          <div className="stats-group secondary-stats">
+            <h4 className="stats-group-title">
+              <FaRoute className="group-title-icon" />
+              Ek Uçuş Metrikleri
+            </h4>
+            <div className="metric-item">
+              <div className="metric-icon"><FaMapMarkedAlt /></div>
+              <div className="metric-details">
+                <span className="metric-label">Ortalama Mesafe:</span>
+                <span className="metric-value">{averageDistance.toLocaleString()} nm</span>
+              </div>
             </div>
-            <div className="metric-details">
-              <span className="metric-label">Toplam Uçuş Süresi:</span>
-              <span className="metric-value">{totalFlightTime.hours} saat {totalFlightTime.minutes} dk</span>
+            <div className="metric-item">
+              <div className="metric-icon"><FaClock /></div>
+              <div className="metric-details">
+                <span className="metric-label">Toplam Uçuş Süresi (Tahmini):</span>
+                <span className="metric-value">{totalFlightTime.hours} saat {totalFlightTime.minutes} dk</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default StatisticsPanel;

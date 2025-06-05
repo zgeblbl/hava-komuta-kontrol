@@ -51,7 +51,7 @@ func LoadConfig() (*Config, error) {
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", "!Fani06!"),
+			Password: getEnv("DB_PASSWORD", "123456"),
 			DBName:   getEnv("DB_NAME", "komutakontrol"),
 			SSLMode:  getEnv("DB_SSL_MODE", "disable"),
 		},
