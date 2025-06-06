@@ -22,33 +22,27 @@ const LeafletAircraftMarker = ({ flight, onClick, isSelected }) => {
   
   const rotation = flight.heading ? flight.heading - 90 : 0;
 
-  const aircraftSvgPath = flight.type === 'hava-savunma' 
-    ? '<rect x="4" y="4" width="16" height="16" rx="2" ry="2" />'
-    : '<path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>';
 
-  const iconHtml = `
-    <div 
-      class="leaflet-custom-aircraft-icon ${isSelected ? 'selected' : ''}" 
-      style="transform: rotate(${rotation}deg); color: ${color};" 
-      title="${flight.callsign} - ${flight.model}"
-    >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        ${aircraftSvgPath}
+  const airportIconHtml = `
+    <div class="leaflet-custom-airport-icon" title="Airport">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#6495ED" style="transform: rotate(180deg);">
+        <polygon points="12,4 4,20 20,20" />
       </svg>
     </div>
   `;
 
-  const customIcon = L.divIcon({
-    html: iconHtml,
-    className: '', 
-    iconSize: [28, 28], 
-    iconAnchor: [14, 14], 
+  const airportIcon = L.divIcon({
+    html: airportIconHtml,
+    className: '',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12], // center
   });
+
   
   return (
     <Marker
       position={[flight.latitude, flight.longitude]}
-      icon={customIcon}
+      icon={airportIcon}
       eventHandlers={{
         click: (e) => {
           onClick(flight, e.originalEvent); 
@@ -151,7 +145,7 @@ const MapViewport = ({ flights, onAircraftClick, selectedFlightId, routeForFligh
             <AnimatedFlight
               key={`animated-${flight.id}`}
               flight={{ id: flight.id, start, end }}
-              duration={8000} // Adjust duration per flight if you want
+              duration={100000} // Adjust duration per flight if you want
             />
           );
         })}

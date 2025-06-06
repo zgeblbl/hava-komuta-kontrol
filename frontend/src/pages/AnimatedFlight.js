@@ -10,7 +10,7 @@ function AnimatedFlight({ flight, duration }) {
     const [startLat, startLng] = flight.start;
     const [endLat, endLng] = flight.end;
 
-    const steps = 200; // Number of animation steps
+    const steps = 50000; // Number of animation steps
     const interval = duration / steps;
 
     let currentStep = 0;

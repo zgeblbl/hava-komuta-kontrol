@@ -1,4 +1,5 @@
 // src/utils/aviationDatabase.js
+import { CircleMarker } from 'react-leaflet';
 
 // --- VERİ KAYNAĞI (Sizin sağladığınız yapı) ---
 export const aviationDatabase = {
@@ -8,61 +9,40 @@ export const aviationDatabase = {
     'LTFJ': { code: 'LTFJ', name: 'Sabiha Gökçen Havalimanı', city: 'İstanbul', country: 'Türkiye', lat: 40.8983, lon: 29.3092, type: 'international' },
     'LTAC': { code: 'LTAC', name: 'Esenboğa Havalimanı', city: 'Ankara', country: 'Türkiye', lat: 40.1281, lon: 32.9950, type: 'international' },
     'LTAI': { code: 'LTAI', name: 'Antalya Havalimanı', city: 'Antalya', country: 'Türkiye', lat: 36.8987, lon: 30.8005, type: 'international' },
-    'LTBJ': { code: 'LTBJ', name: 'Adnan Menderes Havalimanı', city: 'İzmir', country: 'Türkiye', lat: 38.2924, lon: 27.1570, type: 'international' },
-    'LTFE': { code: 'LTFE', name: 'Milas-Bodrum Havalimanı', city: 'Bodrum', country: 'Türkiye', lat: 37.2506, lon: 27.6643, type: 'international' },
-    'LTFD': { code: 'LTFD', name: 'Dalaman Havalimanı', city: 'Dalaman', country: 'Türkiye', lat: 36.7131, lon: 28.7925, type: 'international' },
-    'LTCG': { code: 'LTCG', name: 'Trabzon Havalimanı', city: 'Trabzon', country: 'Türkiye', lat: 40.9951, lon: 39.7897, type: 'domestic' },
-    'LTAF': { code: 'LTAF', name: 'Adana Havalimanı', city: 'Adana', country: 'Türkiye', lat: 36.9822, lon: 35.2804, type: 'international' },
     'LTAY': { code: 'LTAY', name: 'Kayseri Havalimanı', city: 'Kayseri', country: 'Türkiye', lat: 38.7704, lon: 35.4954, type: 'domestic' },
     // Avrupa
     'EDDF': { code: 'EDDF', name: 'Frankfurt Havalimanı', city: 'Frankfurt', country: 'Almanya', lat: 50.0379, lon: 8.5622, type: 'international' },
-    'LFPG': { code: 'LFPG', name: 'Charles de Gaulle', city: 'Paris', country: 'Fransa', lat: 49.0097, lon: 2.5479, type: 'international' },
-    'EGLL': { code: 'EGLL', name: 'Heathrow', city: 'Londra', country: 'İngiltere', lat: 51.4700, lon: -0.4543, type: 'international' },
-    'EHAM': { code: 'EHAM', name: 'Amsterdam Schiphol', city: 'Amsterdam', country: 'Hollanda', lat: 52.3105, lon: 4.7683, type: 'international' },
-    'LEMD': { code: 'LEMD', name: 'Madrid Barajas', city: 'Madrid', country: 'İspanya', lat: 40.4983, lon: -3.5676, type: 'international' },
-    'LIRF': { code: 'LIRF', name: 'Roma Fiumicino', city: 'Roma', country: 'İtalya', lat: 41.8003, lon: 12.2389, type: 'international' },
-    'LFML': { code: 'LFML', name: 'Marsilya', city: 'Marsilya', country: 'Fransa', lat: 43.4393, lon: 5.2214, type: 'international' },
-    'LOWW': { code: 'LOWW', name: 'Viyana', city: 'Viyana', country: 'Avusturya', lat: 48.1103, lon: 16.5697, type: 'international' },
-    'LSZH': { code: 'LSZH', name: 'Zürih', city: 'Zürih', country: 'İsviçre', lat: 47.4647, lon: 8.5492, type: 'international' },
     'EDDM': { code: 'EDDM', name: 'Münih', city: 'Münih', country: 'Almanya', lat: 48.3538, lon: 11.7861, type: 'international' },
     // Ortadoğu
     'OMDB': { code: 'OMDB', name: 'Dubai International', city: 'Dubai', country: 'BAE', lat: 25.2532, lon: 55.3657, type: 'international' },
-    'OIII': { code: 'OIII', name: 'Tahran Imam Khomeini', city: 'Tahran', country: 'İran', lat: 35.4161, lon: 51.1522, type: 'international' },
-    'LLBG': { code: 'LLBG', name: 'Ben Gurion', city: 'Tel Aviv', country: 'İsrail', lat: 32.0094, lon: 34.8855, type: 'international' },
-    'OEJN': { code: 'OEJN', name: 'King Abdulaziz', city: 'Cidde', country: 'Suudi Arabistan', lat: 21.6796, lon: 39.1565, type: 'international' },
     'OKBK': { code: 'OKBK', name: 'Kuwait International', city: 'Kuveyt', country: 'Kuveyt', lat: 29.2268, lon: 47.9689, type: 'international' },
     // Asya
     'ZBAA': { code: 'ZBAA', name: 'Beijing Capital', city: 'Pekin', country: 'Çin', lat: 40.0801, lon: 116.5844, type: 'international' },
-    'RJTT': { code: 'RJTT', name: 'Tokyo Haneda', city: 'Tokyo', country: 'Japonya', lat: 35.5494, lon: 139.7798, type: 'international' },
-    'RKSI': { code: 'RKSI', name: 'Seoul Incheon', city: 'Seul', country: 'Güney Kore', lat: 37.4602, lon: 126.4407, type: 'international' },
-    'WSSS': { code: 'WSSS', name: 'Singapore Changi', city: 'Singapur', country: 'Singapur', lat: 1.3644, lon: 103.9915, type: 'international' },
     'VHHH': { code: 'VHHH', name: 'Hong Kong', city: 'Hong Kong', country: 'Çin', lat: 22.3080, lon: 113.9185, type: 'international' },
     // Amerika
     'KJFK': { code: 'KJFK', name: 'John F. Kennedy', city: 'New York', country: 'ABD', lat: 40.6413, lon: -73.7781, type: 'international' },
-    'KLAX': { code: 'KLAX', name: 'Los Angeles', city: 'Los Angeles', country: 'ABD', lat: 33.9425, lon: -118.4081, type: 'international' },
     'KATL': { code: 'KATL', name: 'Atlanta', city: 'Atlanta', country: 'ABD', lat: 33.6407, lon: -84.4277, type: 'international' },
     // Askeri Üsler
     'ETAR': { code: 'ETAR', name: 'Ramstein Air Base', city: 'Ramstein', country: 'Almanya', lat: 49.4369, lon: 7.6003, type: 'military' },
-    'LTAG': { code: 'LTAG', name: 'İncirlik Air Base', city: 'Adana', country: 'Türkiye', lat: 37.0021, lon: 35.4259, type: 'military' },
     'LGSA': { code: 'LGSA', name: 'Souda Bay', city: 'Girit', country: 'Yunanistan', lat: 35.5317, lon: 24.1497, type: 'military' }
   },
   // YENİ: Hava savunma sistemleri için stratejik konumlar
-  airDefenseLocations: {
-    'AD-IST-01': { code: 'AD-IST-01', name: 'İstanbul Batı Savunma', city: 'İstanbul', country: 'Türkiye', lat: 41.1234, lon: 28.3456 },
-    'AD-IST-02': { code: 'AD-IST-02', name: 'İstanbul Doğu Savunma', city: 'İstanbul', country: 'Türkiye', lat: 41.0567, lon: 29.2345 },
-    'AD-ANK-01': { code: 'AD-ANK-01', name: 'Ankara Merkez Savunma', city: 'Ankara', country: 'Türkiye', lat: 39.8765, lon: 32.7890 },
-    'AD-ANK-02': { code: 'AD-ANK-02', name: 'Ankara Kuzey Savunma', city: 'Ankara', country: 'Türkiye', lat: 40.2345, lon: 32.9876 },
-    'AD-IZM-01': { code: 'AD-IZM-01', name: 'İzmir Körfez Savunma', city: 'İzmir', country: 'Türkiye', lat: 38.5432, lon: 26.9876 },
-    'AD-ADA-01': { code: 'AD-ADA-01', name: 'Adana Bölge Savunma', city: 'Adana', country: 'Türkiye', lat: 37.1234, lon: 35.5678 },
-    'AD-DYB-01': { code: 'AD-DYB-01', name: 'Diyarbakır Savunma', city: 'Diyarbakır', country: 'Türkiye', lat: 37.9654, lon: 40.3456 },
-    'AD-ERZ-01': { code: 'AD-ERZ-01', name: 'Erzurum Doğu Savunma', city: 'Erzurum', country: 'Türkiye', lat: 39.8765, lon: 41.2345 },
-    'AD-ANT-01': { code: 'AD-ANT-01', name: 'Antalya Sahil Savunma', city: 'Antalya', country: 'Türkiye', lat: 36.7890, lon: 30.6543 },
-    'AD-TRB-01': { code: 'AD-TRB-01', name: 'Trabzon Karadeniz Savunma', city: 'Trabzon', country: 'Türkiye', lat: 41.1234, lon: 39.6789 },
-    'AD-VAN-01': { code: 'AD-VAN-01', name: 'Van Sınır Savunma', city: 'Van', country: 'Türkiye', lat: 38.4567, lon: 43.2345 },
-    'AD-HAT-01': { code: 'AD-HAT-01', name: 'Hatay Güney Savunma', city: 'Hatay', country: 'Türkiye', lat: 36.3456, lon: 36.1234 },
+  airportLocations: {
+    'AD-IST-01': { code: 'AD-IST-01', name: 'İstanbul Batı Havaalanı', city: 'İstanbul', country: 'Türkiye', lat: 41.1234, lon: 28.3456 },
+    'AD-IST-02': { code: 'AD-IST-02', name: 'İstanbul Doğu Havaalanı', city: 'İstanbul', country: 'Türkiye', lat: 41.0567, lon: 29.2345 },
+    'AD-ANK-01': { code: 'AD-ANK-01', name: 'Ankara Merkez Havaalanı', city: 'Ankara', country: 'Türkiye', lat: 39.8765, lon: 32.7890 },
+    'AD-ANK-02': { code: 'AD-ANK-02', name: 'Ankara Kuzey Havaalanı', city: 'Ankara', country: 'Türkiye', lat: 40.2345, lon: 32.9876 },
+    'AD-IZM-01': { code: 'AD-IZM-01', name: 'İzmir Körfez Havaalanı', city: 'İzmir', country: 'Türkiye', lat: 38.5432, lon: 26.9876 },
+    'AD-ADA-01': { code: 'AD-ADA-01', name: 'Adana Bölge Havaalanı', city: 'Adana', country: 'Türkiye', lat: 37.1234, lon: 35.5678 },
+    'AD-DYB-01': { code: 'AD-DYB-01', name: 'Diyarbakır Havaalanı', city: 'Diyarbakır', country: 'Türkiye', lat: 37.9654, lon: 40.3456 },
+    'AD-ERZ-01': { code: 'AD-ERZ-01', name: 'Erzurum Doğu Havaalanı', city: 'Erzurum', country: 'Türkiye', lat: 39.8765, lon: 41.2345 },
+    'AD-ANT-01': { code: 'AD-ANT-01', name: 'Antalya Sahil Havaalanı', city: 'Antalya', country: 'Türkiye', lat: 36.7890, lon: 30.6543 },
+    'AD-TRB-01': { code: 'AD-TRB-01', name: 'Trabzon Karadeniz Havaalanı', city: 'Trabzon', country: 'Türkiye', lat: 41.1234, lon: 39.6789 },
+    'AD-VAN-01': { code: 'AD-VAN-01', name: 'Van Sınır Havaalanı', city: 'Van', country: 'Türkiye', lat: 38.4567, lon: 43.2345 },
+    'AD-HAT-01': { code: 'AD-HAT-01', name: 'Hatay Güney Havaalanı', city: 'Hatay', country: 'Türkiye', lat: 36.3456, lon: 36.1234 },
     // Müttefik hava savunma sistemleri
-    'AD-GER-01': { code: 'AD-GER-01', name: 'Ramstein Savunma', city: 'Ramstein', country: 'Almanya', lat: 49.5123, lon: 7.7234 },
-    'AD-GRE-01': { code: 'AD-GRE-01', name: 'Girit Savunma', city: 'Girit', country: 'Yunanistan', lat: 35.4567, lon: 24.2345 }
+    'AD-GER-01': { code: 'AD-GER-01', name: 'Ramstein Havaalanı', city: 'Ramstein', country: 'Almanya', lat: 49.5123, lon: 7.7234 },
+    'AD-GRE-01': { code: 'AD-GRE-01', name: 'Girit Havaalanı', city: 'Girit', country: 'Yunanistan', lat: 35.4567, lon: 24.2345 }
   },
   aircraftModels: {
     sivil: [
@@ -72,7 +52,7 @@ export const aviationDatabase = {
       { model: 'Boeing 777-300ER', cruiseSpeed: 560, maxAltitude: 43100, range: 13650 },
       { model: 'Airbus A320neo', cruiseSpeed: 514, maxAltitude: 39800, range: 6300 },
       { model: 'Airbus A321neo', cruiseSpeed: 514, maxAltitude: 39800, range: 7400 },
-            { model: 'Airbus A330-300', cruiseSpeed: 541, maxAltitude: 41450, range: 11750 },
+      { model: 'Airbus A330-300', cruiseSpeed: 541, maxAltitude: 41450, range: 11750 },
       { model: 'Airbus A350-900', cruiseSpeed: 561, maxAltitude: 43100, range: 15000 },
       { model: 'Airbus A380-800', cruiseSpeed: 561, maxAltitude: 43000, range: 14800 },
       { model: 'Embraer E195-E2', cruiseSpeed: 515, maxAltitude: 41000, range: 4815 },
@@ -108,12 +88,78 @@ export const aviationDatabase = {
       { model: 'Boeing KC-46 Pegasus', cruiseSpeed: 530, maxAltitude: 40100, range: 11830 }
     ],
     'hava-savunma': [
-      { model: 'Patriot Missile System', cruiseSpeed: 0, maxAltitude: 0, range: 160 },
-      { model: 'S-400 Triumf', cruiseSpeed: 0, maxAltitude: 0, range: 400 },
-      { model: 'HAWK XXI', cruiseSpeed: 0, maxAltitude: 0, range: 50 },
-      { model: 'Hisar-A+', cruiseSpeed: 0, maxAltitude: 0, range: 15 },
-      { model: 'Hisar-O+', cruiseSpeed: 0, maxAltitude: 0, range: 30 },
-      { model: 'SAMP/T Aster 30', cruiseSpeed: 0, maxAltitude: 0, range: 120 }
+      {
+    model: 'Patriot Missile System',
+    cruiseSpeed: 0,
+    maxAltitude: 0,
+    range: 160,
+    code: 'PAT-MS',
+    city: 'Ankara',
+    country: 'Turkey',
+    lat: 39.9208,
+    lon: 32.8541,
+    type: 'airport',
+  },
+  {
+    model: 'S-400 Triumf',
+    cruiseSpeed: 0,
+    maxAltitude: 0,
+    range: 400,
+    code: 'S400-TR',
+    city: 'Moscow',
+    country: 'Russia',
+    lat: 55.7558,
+    lon: 37.6173,
+    type: 'airport',
+  },
+  {
+    model: 'HAWK XXI',
+    cruiseSpeed: 0,
+    maxAltitude: 0,
+    range: 50,
+    code: 'HAWK21',
+    city: 'İzmir',
+    country: 'Turkey',
+    lat: 38.4192,
+    lon: 27.1287,
+    type: 'airport',
+  },
+  {
+    model: 'Hisar-A+',
+    cruiseSpeed: 0,
+    maxAltitude: 0,
+    range: 15,
+    code: 'HSR-A+',
+    city: 'Gaziantep',
+    country: 'Turkey',
+    lat: 37.0662,
+    lon: 37.3833,
+    type: 'airport',
+  },
+  {
+    model: 'Hisar-O+',
+    cruiseSpeed: 0,
+    maxAltitude: 0,
+    range: 30,
+    code: 'HSR-O+',
+    city: 'Konya',
+    country: 'Turkey',
+    lat: 37.8746,
+    lon: 32.4932,
+    type: 'airport',
+  },
+  {
+    model: 'SAMP/T Aster 30',
+    cruiseSpeed: 0,
+    maxAltitude: 0,
+    range: 120,
+    code: 'SAMP-T',
+    city: 'Rome',
+    country: 'Italy',
+    lat: 41.9028,
+    lon: 12.4964,
+    type: 'airport',
+  },
     ]
   },
   airlines: {
@@ -145,7 +191,7 @@ export const aviationDatabase = {
     askeri: ['PATROL', 'INTERCEPT', 'TRAINING', 'TRANSPORT', 'RECON', 'CAP (Combat Air Patrol)'],
     vip: ['VIP_TRANSPORT_DOMESTIC', 'VIP_TRANSPORT_INTERNATIONAL'],
     muttefik: ['AWACS_ORBIT', 'TANKER_SUPPORT', 'JOINT_TRANSPORT', 'SURVEILLANCE_MISSION', 'EXERCISE_PARTICIPATION'],
-    'hava-savunma': ['ACTIVE_DEFENSE', 'SYSTEM_STANDBY', 'OPERATIONAL_MAINTENANCE']
+    'hava-savunma': ['AIRPORT', 'SYSTEM_STANDBY', 'OPERATIONAL_MAINTENANCE']
   },
   flightStatuses: ['enroute', 'scheduled', 'landed', 'delayed', 'active']
 };
@@ -246,24 +292,24 @@ export const generateRandomFlight = (existingFlights = []) => {
   
   if (selectedFlightType === 'hava-savunma') {
     // HAVA SAVUNMA SİSTEMLERİ İÇİN ÖZEL MANTIK - STRATEJİK KONUMLAR
-    const defenseLocationList = Object.values(aviationDatabase.airDefenseLocations);
-    const defenseLocation = getRandomElement(defenseLocationList);
+    const airportLocationList = Object.values(aviationDatabase.airportLocations);
+    const airportLocation = getRandomElement(airportLocationList);
     
-    if (!defenseLocation) return null;
+    if (!airportLocation) return null;
     
     // Hava savunma sistemleri için özel konum ve bilgiler
     originAirport = {
-      code: defenseLocation.code,
-      name: defenseLocation.name,
-      city: defenseLocation.city,
-      country: defenseLocation.country,
-      lat: defenseLocation.lat,
-      lon: defenseLocation.lon,
-      type: 'air-defense'
+      code: airportLocation.code,
+      name: airportLocation.name,
+      city: airportLocation.city,
+      country: airportLocation.country,
+      lat: airportLocation.lat,
+      lon: airportLocation.lon,
+      type: 'airport'
     };
     
     destinationAirport = originAirport;
-    destinationName = getRandomElement(aviationDatabase.missionTypes['hava-savunma']) || 'ACTIVE_DEFENSE';
+    destinationName = getRandomElement(aviationDatabase.missionTypes['hava-savunma']) || 'AIRPORT';
   } else {
     // Diğer uçuş tipleri için normal havalimanı seçimi
     originAirport = getRandomElement(airportList.filter(a => {
@@ -457,8 +503,8 @@ for (let i = 0; i < numberOfInitialFlights; i++) {
 }
 
 // Sonra hava savunma sistemlerini ekle (3-5 adet)
-const numberOfAirDefenseSystems = getRandomInt(3, 5);
-for (let i = 0; i < numberOfAirDefenseSystems; i++) {
+const numberOfAirportSystems = getRandomInt(3, 5);
+for (let i = 0; i < numberOfAirportSystems; i++) {
   // Özel olarak hava savunma sistemi oluştur
   const flightTypes = ['hava-savunma'];
   const selectedFlightType = flightTypes[0];
@@ -466,17 +512,17 @@ for (let i = 0; i < numberOfAirDefenseSystems; i++) {
   const aircraftData = getRandomElement(modelsInType);
   
   if (aircraftData) {
-    const defenseLocationList = Object.values(aviationDatabase.airDefenseLocations);
-    const defenseLocation = defenseLocationList[i % defenseLocationList.length]; // Farklı lokasyonlar kullan
+    const airportLocationList = Object.values(aviationDatabase.airportLocations);
+    const airportLocation = airportLocationList[i % airportLocationList.length]; // Farklı lokasyonlar kullan
     
     const originAirport = {
-      code: defenseLocation.code,
-      name: defenseLocation.name,
-      city: defenseLocation.city,
-      country: defenseLocation.country,
-      lat: defenseLocation.lat,
-      lon: defenseLocation.lon,
-      type: 'air-defense'
+      code: airportLocation.code,
+      name: airportLocation.name,
+      city: airportLocation.city,
+      country: airportLocation.country,
+      lat: airportLocation.lat,
+      lon: airportLocation.lon,
+      type: 'airport'
     };
     
     const systemPrefix = aircraftData.model.includes('S-400') ? 'S4' : 
@@ -488,7 +534,7 @@ for (let i = 0; i < numberOfAirDefenseSystems; i++) {
     flightIdCounter++;
     const flightId = `${callsign.replace(/[^A-Z0-9]/gi, '')}-${Date.now().toString().slice(-5)}-${flightIdCounter}`;
     
-    const airDefenseSystem = {
+    const airportSystem = {
       id: flightId,
       callsign,
       model: aircraftData.model,
@@ -496,7 +542,7 @@ for (let i = 0; i < numberOfAirDefenseSystems; i++) {
       origin: originAirport.code,
       origin_city: originAirport.city,
       origin_country: originAirport.country,
-      destination: 'ACTIVE_DEFENSE',
+      destination: 'AIRPORT',
       destination_city: 'Savunma Alanı',
       destination_country: originAirport.country,
       departureTime: new Date().toISOString(),
@@ -514,7 +560,7 @@ for (let i = 0; i < numberOfAirDefenseSystems; i++) {
       flightDurationMinutes: 0
     };
     
-    initialFlights.push(airDefenseSystem);
+    initialFlights.push(airportSystem);
   }
 }
 
@@ -524,7 +570,7 @@ console.log(`Başlangıçta ${initialFlights.filter(f => f.type !== 'hava-savunm
 export const AIRPORTS_DATA = aviationDatabase.airports;
 
 // Hava savunma lokasyonlarını da export edelim
-export const AIR_DEFENSE_LOCATIONS = aviationDatabase.airDefenseLocations;
+export const AIRPORT_LOCATIONS = aviationDatabase.airportLocations;
 
 // Default export
 export default aviationDatabase;

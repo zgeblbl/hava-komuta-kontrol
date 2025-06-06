@@ -11,7 +11,7 @@ import aviationDatabase, {
   initialFlights as defaultInitialFlights,
   generateRandomFlight,
   AIRPORTS_DATA,
-  AIR_DEFENSE_LOCATIONS,
+  AIRPORT_LOCATIONS,
   getRandomInt,
   getDistance
 } from './aviationDatabase';   // ←  utils klasörü için ../
@@ -308,7 +308,7 @@ const FlightControlPage = () => {
         <MapViewport
           flights={flights}
           airports={AIRPORTS_DATA}
-          airDefenseLocations={AIR_DEFENSE_LOCATIONS}
+          airportLocations={AIRPORT_LOCATIONS}
           onAircraftClick={handleAircraftClick}
           selectedFlightId={selectedFlight?.id}
           routeForFlightId={showRouteForFlightId}
